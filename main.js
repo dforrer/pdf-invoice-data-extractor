@@ -82,7 +82,7 @@ const parser = require('./parser.js');
 const exec = require("child_process").exec;
 
 // Constants
-const ocrmypdf = true;
+const ocrmypdf = false;
 const q = new Queue();
 var running_jobs_count = 0;
 
@@ -100,40 +100,32 @@ function schedule_job() {
     running_jobs_count += 1;
     var nextEl = q.last();
     q.remove();
-    var nextPDF = nextEl.pdf;
     if ( ocrmypdf ) {
-        const cmd = 'ocrmypdf -l deu --force-ocr "' + nextPDF.filepath + '" "' + nextPDF.filepath + '"';
-
+        const cmd = 'ocrmypdf -l deu --force-ocr "' + nextEl.pdf.filepath + '" "' + nextEl.pdf.filepath + '"';
         exec( cmd, (error, stdout, stderr) => {
             if (error) {
                 console.error(`exec error: ${error}`);
                 return;
             }
-            pdfExtract.extract( nextPDF.filepath, options, (err, data) => {
-                if (err) return console.log(err);
-                parser.parseJsonAndExport( data,
-                    function(rv) {
-                        nextPDF.extracted_data = rv;
-                        nextEl.event.reply('data-extraction-done', nextPDF);
-                        running_jobs_count -= 1;
-                        schedule_job();
-                    }
-                );
-            });
+            extract_pdf( nextEl );
         });
     } else {
-        pdfExtract.extract( nextPDF.filepath, options, (err, data) => {
-            if (err) return console.log(err);
-            parser.parseJsonAndExport( data,
-                function(rv) {
-                    nextPDF.extracted_data = rv;
-                    nextEl.event.reply('data-extraction-done', nextPDF);
-                    running_jobs_count -= 1;
-                    schedule_job();
-                }
-            );
-        });
+        extract_pdf( nextEl );
     }
+}
+
+function extract_pdf ( nextEl ) {
+    pdfExtract.extract( nextEl.pdf.filepath, options, (err, data) => {
+        if (err) return console.log(err);
+        parser.parseJsonAndExport( data,
+            function(rv) {
+                nextEl.pdf.extracted_data = rv;
+                nextEl.event.reply('data-extraction-done', nextEl.pdf);
+                running_jobs_count -= 1;
+                schedule_job();
+            }
+        );
+    });
 }
 
 // Make this app a single instance app.

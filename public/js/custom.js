@@ -121,7 +121,7 @@ function iterateAttribues ( json ) {
         var key   = p[0];
         var matchArray = p[1];
         switch ( key ) {
-            //case 'mwst':
+            case 'mwst':
             case 'iban':
             case 'email':
             case 'esr_betrag':

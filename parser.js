@@ -67,7 +67,7 @@ function cleanup_extracted_data ( d ) {
     // endbetrag cleanup ------------------
     var endbetrag_rv = [];
     for (const p of Object.entries(d.endbetrag)) {
-        var key   = p[0];
+        var key = p[0];
         // check if key contains keywords like datum, date, ...
         if ( /exk|innert (10|14|15|20|30)|zwischensumme/gi.test(key) ) {
             continue;
@@ -87,7 +87,7 @@ function cleanup_extracted_data ( d ) {
         }
         endbetrag_rv.push( r );
     }
-    d.endbetrag = endbetrag_rv;
+    d.endbetrag = endbetrag_rv.reverse();
 
     // waehrung cleanup ---------------
     var waehrung_rv = [];
@@ -187,6 +187,11 @@ function cleanup_extracted_data ( d ) {
     }
     d.rechnungsart = rechnungsart_rv;
 
+    // Default wert setzen R(echnung)
+    if ( d.rechnungsart.length == 0 ) {
+        d.rechnungsart.push( { match:"R", position:0, value:"R" } );
+    }
+
     // esr_mit_betrag cleanup ---------------
     var esr_betrag_rv   = [];
     var esr_referenz_rv = [];
@@ -220,6 +225,11 @@ function cleanup_extracted_data ( d ) {
     d.esr_betrag    = esr_betrag_rv;
     d.esr_referenz  = esr_referenz_rv;
     d.esr_konto     = esr_konto_rv;
+
+    // falls währung noch leer setzen wir sie hier auf CHF wegen dem ESR
+    if ( d.waehrung.length == 0 ) {
+        d.waehrung.push( { match:"CHF", position:0, value:"CHF" } );
+    }
 
     // esr_ohne_betrag cleanup ---------------
     if ( Object.entries(d.esr_ohne_betrag) != 0 ) {
@@ -322,7 +332,7 @@ function rg_datum_cleanup ( rg_datum ) {
 
 function extractRegex( str ) {
     var pattern_seiten = /---------- (\d{1,5}) ----------/gim;
-    var pattern_rechnungsart = /(?:\b(?:Ausgangs)?(R)(?:echnung\b))|(?:\b(R)(?:g\.\b))|(?:\b(R)g\b)|(?:\b(I)nvoice\b)|(?:\bFaktu(r)a\b)|(?:\bFactu(r)e\b)|(?:\b(G)utschrift\b)|(?:\b(C)redit note\b)|(?:\b(c)rédit\b)/gim;
+    var pattern_rechnungsart = /(?:\b(?:Ausgangs)?(R)(?:echnung))|(?:\b(R)(?:g\.\b))|(?:\b(R)g\b)|(?:\b(I)nvoice)|(?:\bFaktu(r)a)|(?:\bFactu(r)e)|(?:\b(G)utschrift)|(?:\b(C)redit note)|(?:\b(c)rédit)/gim;
     var pattern_mwst = /((?:(?:CHE)(?:-|\s)?)\d{3}(?:\.|\s)?\d{3}(?:\.|\s)?\d{3})(?: |\t)?/gim;
     var pattern_waehrung = /(\bCHF\b)|(\bEUR\b)|(\bUSD\b)|(\bGBP\b)/gim;
     var pattern_iban = /\b((?:CH|HR|LI|LV) ?[0-9]{2}(?:[ ]?[a-zA-Z0-9]{4}){4}(?:[ ]?[a-zA-Z0-9]{1}))|((?:BG|BH|CR|DE|GB|GE|IE|ME|RS|VA) ?[0-9]{2}(?:[ ]?[a-zA-Z0-9]{4}){4}(?:[ ]?[a-zA-Z0-9]{2}))|((?:NO) ?[0-9]{2}(?:[ ]?[a-zA-Z0-9]{4}){2}(?:[ ]?[a-zA-Z0-9]{3}))|((?:BE|BI) ?[0-9]{2}(?:[ ]?[a-zA-Z0-9]{4}){3})|((?:DK|FI|FO|GL|NL) ?[0-9]{2}(?:[ ]?[a-zA-Z0-9]{4}){3}(?:[ ]?[a-zA-Z0-9]{2}))|((?:MK|SI) ?[0-9]{2}(?:[ ]?[a-zA-Z0-9]{4}){3}(?:[ ]?[a-zA-Z0-9]{3}))|((?:AT|BA|EE|KZ|LT|LU|XK) ?[0-9]{2}(?:[ ]?[a-zA-Z0-9]{4}){4})|((?:AE|GI|IL|IQ|TL) ?[0-9]{2}(?:[ ]?[a-zA-Z0-9]{4}){4}(?:[ ]?[a-zA-Z0-9]{3}))|((?:AD|CZ|DZ|ES|MD|PK|RO|SA|SE|SK|TN|VG) ?[0-9]{2}(?:[ ]?[a-zA-Z0-9]{4}){5})|((?:AO|CV|MZ|PT|ST) ?[0-9]{2}(?:[ ]?[a-zA-Z0-9]{4}){5}(?:[ ]?[a-zA-Z0-9]{1}))|((?:IR|IS|TR) ?[0-9]{2}(?:[ ]?[a-zA-Z0-9]{4}){5}(?:[ ]?[a-zA-Z0-9]{2}))|((?:BF|CF|CG|CM|EG|FR|GA|GR|IT|MC|MG|MR|SM) ?[0-9]{2}(?:[ ]?[a-zA-Z0-9]{4}){5}(?:[ ]?[a-zA-Z0-9]{3}))|((?:AL|AZ|BJ|BY|CI|CY|DO|GT|HU|LB|ML|PL|SN|SV) ?[0-9]{2}(?:[ ]?[a-zA-Z0-9]{4}){6})|((?:BR|PS|QA|UA) ?[0-9]{2}(?:[ ]?[a-zA-Z0-9]{4}){6}(?:[ ]?[a-zA-Z0-9]{1}))|((?:JO|KW|MU) ?[0-9]{2}(?:[ ]?[a-zA-Z0-9]{4}){6}(?:[ ]?[a-zA-Z0-9]{2}))|((?:MT|SC) ?[0-9]{2}(?:[ ]?[a-zA-Z0-9]{4}){6}(?:[ ]?[a-zA-Z0-9]{3}))|((?:LC) ?[0-9]{2}(?:[ ]?[a-zA-Z0-9]{4}){7})\b/gm;
@@ -490,7 +500,7 @@ function keepAlpha( str ) {
 function sortContent( c ) {
     c.sort( function ( a, b ) {
         // same line
-        if ( Math.abs(a.y - b.y) < 0.1 ) {
+        if ( Math.abs(a.y - b.y) < 5.0 ) {
             return a.x - b.x;
         } else {
             return a.y - b.y;
@@ -501,7 +511,7 @@ function sortContent( c ) {
 
 // Helper function
 function appendText( text, prevEl, newEl ) {
-    if ( Math.abs( prevEl.y - newEl.y ) < 0.1 ) {
+    if ( Math.abs( prevEl.y - newEl.y ) < 5.0 ) {
         if (Math.abs( prevEl.x + prevEl.width - newEl.x) > 0.5 ) {
             text += ' ' + newEl.str;
         } else {

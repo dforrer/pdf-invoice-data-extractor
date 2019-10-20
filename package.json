@@ -1,0 +1,24 @@
+{
+  "name": "pdf-invoice-data-extractor",
+  "version": "1.0.0",
+  "description": "electron app with pdf.js display",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "keywords": [
+    "pdf.js",
+    "electron"
+  ],
+  "author": "Daniel Forrer",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "filepond": "^4.7.2",
+    "multer": "^1.4.2",
+    "pdf.js-extract": "^0.1.3"
+  },
+  "devDependencies": {
+    "electron": "^6.0.12"
+  }
+}

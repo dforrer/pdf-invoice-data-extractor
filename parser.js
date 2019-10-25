@@ -194,69 +194,57 @@ function cleanup_extracted_data ( d ) {
         d.rechnungsart.push( { match:"R", position:0, value:"R" } );
     }
 
-    // esr_mit_betrag cleanup ---------------
+    // esr_betrag cleanup ---------------
     var esr_betrag_rv   = [];
-    var esr_referenz_rv = [];
-    var esr_konto_rv    = [];
 
-    for (const p of Object.entries(d.esr_mit_betrag)) {
-        // clear esr_ohne_betrag if we have an entry in esr_mit_betrag
-        d.esr_ohne_betrag = {};
+    for (const p of Object.entries(d.esr_betrag)) {
         // setup variables
         var key         = p[0];
         var value       = p[1];
         var r_betrag    = {};
-        var r_referenz  = {};
-        var r_konto     = {};
         // betrag
         r_betrag.match      = value.g1;
         r_betrag.value      = value.g1;
         r_betrag.position   = value.i;
         esr_betrag_rv.push( r_betrag );
+    }
+    d.esr_betrag    = esr_betrag_rv;
+
+    // esr_referenz cleanup ---------------
+    var esr_referenz_rv = [];
+
+    for (const p of Object.entries(d.esr_referenz)) {
+        // setup variables
+        var key         = p[0];
+        var value       = p[1];
+        var r_referenz  = {};
         // referenz
-        r_referenz.match    = value.g2;
-        r_referenz.value    = value.g2;
+        r_referenz.match    = value.g1;
+        r_referenz.value    = value.g1;
         r_referenz.position = value.i;
         esr_referenz_rv.push( r_referenz );
+    }
+    d.esr_referenz  = esr_referenz_rv;
+
+    // esr_konto cleanup ---------------
+    var esr_konto_rv    = [];
+
+    for (const p of Object.entries(d.esr_konto)) {
+        // setup variables
+        var key         = p[0];
+        var value       = p[1];
+        var r_konto     = {};
         // konto
-        r_konto.match       = value.g3;
-        r_konto.value       = value.g3;
+        r_konto.match       = value.g1;
+        r_konto.value       = value.g1;
         r_konto.position    = value.i;
         esr_konto_rv.push( r_konto );
     }
-    d.esr_betrag    = esr_betrag_rv;
-    d.esr_referenz  = esr_referenz_rv;
     d.esr_konto     = esr_konto_rv;
 
     // falls währung noch leer setzen wir sie hier auf CHF wegen dem ESR
     if ( d.waehrung.length == 0 ) {
         d.waehrung.push( { match:"CHF", position:0, value:"CHF" } );
-    }
-
-    // esr_ohne_betrag cleanup ---------------
-    if ( Object.entries(d.esr_ohne_betrag) != 0 ) {
-        var esr_ohne_referenz_rv = [];
-        var esr_ohne_konto_rv    = [];
-
-        for (const p of Object.entries(d.esr_ohne_betrag)) {
-            // setup variables
-            var key         = p[0];
-            var value       = p[1];
-            var r_referenz  = {};
-            var r_konto     = {};
-            // referenz
-            r_referenz.match    = value.g2;
-            r_referenz.value    = value.g2;
-            r_referenz.position = value.i;
-            esr_ohne_referenz_rv.push( r_referenz );
-            // konto
-            r_konto.match       = value.g3;
-            r_konto.value       = value.g3;
-            r_konto.position    = value.i;
-            esr_ohne_konto_rv.push( r_konto );
-        }
-        d.esr_referenz  = esr_ohne_referenz_rv;
-        d.esr_konto     = esr_ohne_konto_rv;
     }
 
     // check if esr_betrag is not empty
@@ -266,6 +254,10 @@ function cleanup_extracted_data ( d ) {
         var esr_betrag = parseFloat( d.esr_betrag[0].value.substring(2, 12) )/100;
         d.endbetrag = [];
         d.endbetrag.push( { match: d.esr_betrag[0].match, position:d.esr_betrag[0].position, value:esr_betrag } );
+    }
+
+    if ( d.esr_konto.length == 0 ) {
+        d.esr_referenz = [];
     }
 
     // delete elements
@@ -338,6 +330,9 @@ function extractRegex( str ) {
     var pattern_mwst = /((?:(?:CHE)(?:-|\s)?)\d{3}(?:\.|\s)?\d{3}(?:\.|\s)?\d{3})(?: |\t)?/gim;
     var pattern_waehrung = /(\bCHF\b)|(\bEUR\b)|(\bUSD\b)|(\bGBP\b)/gim;
     var pattern_iban = /\b((?:CH|HR|LI|LV) ?[0-9]{2}(?:[ ]?[a-zA-Z0-9]{4}){4}(?:[ ]?[a-zA-Z0-9]{1}))|((?:BG|BH|CR|DE|GB|GE|IE|ME|RS|VA) ?[0-9]{2}(?:[ ]?[a-zA-Z0-9]{4}){4}(?:[ ]?[a-zA-Z0-9]{2}))|((?:NO) ?[0-9]{2}(?:[ ]?[a-zA-Z0-9]{4}){2}(?:[ ]?[a-zA-Z0-9]{3}))|((?:BE|BI) ?[0-9]{2}(?:[ ]?[a-zA-Z0-9]{4}){3})|((?:DK|FI|FO|GL|NL) ?[0-9]{2}(?:[ ]?[a-zA-Z0-9]{4}){3}(?:[ ]?[a-zA-Z0-9]{2}))|((?:MK|SI) ?[0-9]{2}(?:[ ]?[a-zA-Z0-9]{4}){3}(?:[ ]?[a-zA-Z0-9]{3}))|((?:AT|BA|EE|KZ|LT|LU|XK) ?[0-9]{2}(?:[ ]?[a-zA-Z0-9]{4}){4})|((?:AE|GI|IL|IQ|TL) ?[0-9]{2}(?:[ ]?[a-zA-Z0-9]{4}){4}(?:[ ]?[a-zA-Z0-9]{3}))|((?:AD|CZ|DZ|ES|MD|PK|RO|SA|SE|SK|TN|VG) ?[0-9]{2}(?:[ ]?[a-zA-Z0-9]{4}){5})|((?:AO|CV|MZ|PT|ST) ?[0-9]{2}(?:[ ]?[a-zA-Z0-9]{4}){5}(?:[ ]?[a-zA-Z0-9]{1}))|((?:IR|IS|TR) ?[0-9]{2}(?:[ ]?[a-zA-Z0-9]{4}){5}(?:[ ]?[a-zA-Z0-9]{2}))|((?:BF|CF|CG|CM|EG|FR|GA|GR|IT|MC|MG|MR|SM) ?[0-9]{2}(?:[ ]?[a-zA-Z0-9]{4}){5}(?:[ ]?[a-zA-Z0-9]{3}))|((?:AL|AZ|BJ|BY|CI|CY|DO|GT|HU|LB|ML|PL|SN|SV) ?[0-9]{2}(?:[ ]?[a-zA-Z0-9]{4}){6})|((?:BR|PS|QA|UA) ?[0-9]{2}(?:[ ]?[a-zA-Z0-9]{4}){6}(?:[ ]?[a-zA-Z0-9]{1}))|((?:JO|KW|MU) ?[0-9]{2}(?:[ ]?[a-zA-Z0-9]{4}){6}(?:[ ]?[a-zA-Z0-9]{2}))|((?:MT|SC) ?[0-9]{2}(?:[ ]?[a-zA-Z0-9]{4}){6}(?:[ ]?[a-zA-Z0-9]{3}))|((?:LC) ?[0-9]{2}(?:[ ]?[a-zA-Z0-9]{4}){7})\b/gm;
+    var pattern_esr_betrag  = /(\d{13})>/gim;
+    var pattern_esr_konto = /(?:\D)(0(?:1|3)\d{7})>/gim;
+    var pattern_esr_referenz  = /(\d{5,27})\+/gim;
     var pattern_esr_mit_betrag  = /(?:\s|\D|^)(\d{13})>(\d{5,27})\+\s{0,3}(\d{9})>/gim;
     var pattern_esr_ohne_betrag = /(?:\s|\D|^)(\d{3})>(\d{5,27})\+\s{0,3}(\d{9})>/gim;
     // datum_dirty_ddmmyy allows whitespace as separators between numbers
@@ -346,7 +341,6 @@ function extractRegex( str ) {
     var pattern_datum_mmddyy = /TODO/gim;
     var pattern_datum_yymmdd = /TODO/gim;
     var pattern_referenz = /TODO/gim;
-
 
     var pattern_email = /\b((?:(?:[^<>()\[\]\\.,;:\s@"]+(?:\.[^<>()\[\]\\.,;:\s@"]+)*)|(?:".+"))@(?:(?:\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(?:(?:[a-zA-Z\-0-9]+(?:\.))+[a-zA-Z]{2,})))\b/gim;
     var pattern_endbetrag = /(?:rechnungstotal|gesamtsumme|summe|amount|gesamtbetrag|total|invoicetotal|betrag|chf|sfr|fr\.|eur|usd|gbp|\$|€|brutto)(?:\s|\D){1,20}((?:\d{1,3}(?:\'|\’|\.|\,|\s)?)?(?:\d{1,3}(?:(?:\'|\.|\,|\ )\d{2})))(?!%|\d)/gim;
@@ -418,13 +412,16 @@ function extractRegex( str ) {
          mwst: pattern_mwst,
          waehrung: pattern_waehrung,
          iban: pattern_iban,
-         esr_mit_betrag: pattern_esr_mit_betrag,
-         esr_ohne_betrag: pattern_esr_ohne_betrag,
+         //esr_mit_betrag: pattern_esr_mit_betrag,
+         //esr_ohne_betrag: pattern_esr_ohne_betrag,
          //rg_datum: pattern_datum_ddmmyy,
          rg_datum_dirty: pattern_datum_dirty_ddmmyy,
          email: pattern_email,
          endbetrag: pattern_endbetrag,
-         rg_nummer: pattern_rechnungsnummer
+         rg_nummer: pattern_rechnungsnummer,
+         esr_betrag: pattern_esr_betrag,
+         esr_konto: pattern_esr_konto,
+         esr_referenz: pattern_esr_referenz
      };
 
     var rv = {};

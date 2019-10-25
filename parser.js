@@ -87,7 +87,9 @@ function cleanup_extracted_data ( d ) {
         }
         endbetrag_rv.push( r );
     }
-    d.endbetrag = endbetrag_rv.reverse();
+    d.endbetrag = endbetrag_rv.sort( function ( a, b ) {
+        return b.value - a.value;
+    });
 
     // waehrung cleanup ---------------
     var waehrung_rv = [];
@@ -347,7 +349,7 @@ function extractRegex( str ) {
 
 
     var pattern_email = /\b((?:(?:[^<>()\[\]\\.,;:\s@"]+(?:\.[^<>()\[\]\\.,;:\s@"]+)*)|(?:".+"))@(?:(?:\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(?:(?:[a-zA-Z\-0-9]+(?:\.))+[a-zA-Z]{2,})))\b/gim;
-    var pattern_endbetrag = /(?:(?:end|zwischen)summe|Rechnungstotal|Rechnungstotal|(?:Gesamt|Rechnung(?:s)?)?(?:total|summe|betrag)(?:\ +)?(?:Rechnung)?(?:in)?|Rechnungsbetrag|Total (?:Rechnung|amount))(?:\ +)?(?:30 Tage netto)?.+(?:(?:in)?(\ )(?:CHF|EUR|USD|GBP|(?:\D){1,4}))?\ ?\:?(?:\ +)?(?:\(?ink(?:\D)?(?:\.|\,)? MWST\.?\)?)?\ +?(?:CHF|EUR|USD|GBP|Fr.)?(?:\ +)?((?:\d{1,3}(?:\'|\’|\.|\,|\s)?)?(?:\d{1,3}(?:(?:\'|\.|\,|\ )\d{0,2})))/gim;
+    var pattern_endbetrag = /(?:rechnungstotal|gesamtsumme|summe|amount|gesamtbetrag|total|invoicetotal|betrag|chf|sfr|fr\.|eur|usd|gbp|\$|€|brutto)(?:\s|\D){1,20}((?:\d{1,3}(?:\'|\’|\.|\,|\s)?)?(?:\d{1,3}(?:(?:\'|\.|\,|\ )\d{2})))(?!%|\d)/gim;
     var pattern_rechnungsnummer = /(?:(?:rechnung|Rechn|faktura|facture|invoice|Gutschrift|credit note)(?:\d|\D)?(?:\n)?(?:nummer|number|nr\.|Nr):?\s?(\d{2,16}))|(?:(?:Rechnung|Rechn|faktura|facture|invoice)(?:\D{1,16})?(\d+(?:\.|\'|-)?\d+))|(?:(?:Rechnung|faktura|facture|invoice|Gutschrift|credit note)(?:\D{1,16})?(?:\n)?(?:\D{1,6})?(?:\n)?(\d{2,16}))/gim;
 
     /*
@@ -467,7 +469,7 @@ function parseJSON( data ) {
     for ( var p = 0 ; p < pages.length ; p++ ) {
         out += '\n---------- ' + (p+1) + ' ----------\n'
         var content = pages[p].content;
-        content = sortContent(content);
+        //content = sortContent(content);
         for ( var i = 0 ; i < content.length; i++ ) {
             if ( i == 0 ) {
                 out += pages[0].content[0].str;
@@ -511,15 +513,7 @@ function sortContent( c ) {
 
 // Helper function
 function appendText( text, prevEl, newEl ) {
-    if ( Math.abs( prevEl.y - newEl.y ) < 5.0 ) {
-        if (Math.abs( prevEl.x + prevEl.width - newEl.x) > 0.5 ) {
-            text += ' ' + newEl.str;
-        } else {
-            text += newEl.str;
-        }
-    } else {
-        text += '\n' + newEl.str;
-    }
+    text += ' ' + newEl.str;
     return text;
 }
 
@@ -529,10 +523,11 @@ function cleanup( text ) {
     var lines = text.split("\n");
     for (var i = 0; i < lines.length; i++) {
         var lineVal    = lines[i].trim();
+        lineVal = lineVal.replace(/\s{2,}/g, ' ');
         var lineLength = lineVal.length;
-        if ( lineLength > 2 ) {
+        //if ( lineLength > 2 ) {
             out += lineVal + '\n';
-        }
+        //}
     }
     return out;
 }

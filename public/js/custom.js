@@ -61,6 +61,7 @@ function nextPDF() {
         iterateAttribues( next_pdf.extracted_data );
     } else {
         PDFViewerApplication.close();
+        removeInputsFromExtractorContainer();
     }
     update_button_load_next_pdf();
 }
@@ -111,12 +112,16 @@ function loadJSONData() {
       })
 }
 
-function iterateAttribues ( json ) {
+function removeInputsFromExtractorContainer() {
     var extractorContainer = document.getElementById('extracted_data');
     // remove all childnodes
     while (extractorContainer.firstChild) {
         extractorContainer.removeChild(extractorContainer.firstChild);
     }
+}
+
+function iterateAttribues ( json ) {
+    removeInputsFromExtractorContainer();
     for (const p of Object.entries( json )) {
         var key   = p[0];
         var matchArray = p[1];
@@ -140,7 +145,6 @@ function iterateAttribues ( json ) {
                 break;
             default:
         }
-
         addInputDiv ( key, matchArray[0]);
     }
 }

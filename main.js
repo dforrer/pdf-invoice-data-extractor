@@ -80,9 +80,11 @@ const pdfExtract = new PDFExtract();
 const options = {};
 const parser = require('./parser.js');
 const exec = require("child_process").exec;
+const fs = require('fs');
 
 // Constants
-const ocrmypdf = false;
+const OCRMYPDF = true;
+const DEBUG = true;
 const q = new Queue();
 var running_jobs_count = 0;
 
@@ -100,7 +102,7 @@ function schedule_job() {
     running_jobs_count += 1;
     var nextEl = q.last();
     q.remove();
-    if ( ocrmypdf ) {
+    if ( OCRMYPDF ) {
         const cmd = 'ocrmypdf -l deu --force-ocr "' + nextEl.pdf.filepath + '" "' + nextEl.pdf.filepath + '"';
         exec( cmd, (error, stdout, stderr) => {
             if (error) {
@@ -118,11 +120,17 @@ function extract_pdf ( nextEl ) {
     pdfExtract.extract( nextEl.pdf.filepath, options, (err, data) => {
         if (err) return console.log(err);
         parser.parseJsonAndExport( data,
-            function(rv) {
-                nextEl.pdf.extracted_data = rv;
+            function(pdf_text, extracted_data) {
+                nextEl.pdf.extracted_data = extracted_data;
                 nextEl.event.reply('data-extraction-done', nextEl.pdf);
                 running_jobs_count -= 1;
                 schedule_job();
+                if ( DEBUG ) {
+                    // write file to disk
+                    fs.writeFile( nextEl.pdf.filepath + '.txt', pdf_text, 'utf8', (err) => {
+                        if (err) throw err;
+                    });
+                }
             }
         );
     });

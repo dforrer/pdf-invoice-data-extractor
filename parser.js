@@ -27,13 +27,13 @@ const util = require('util');
 
 // Main function
 function parseJsonAndExport ( data, cb ) {
-    var out = parseJSON( data );
-    var extracted_data = extractRegex( out );
+    var pdf_text = parseJSON( data );
+    var extracted_data = extractRegex( pdf_text );
 
     extracted_data = cleanup_extracted_data(extracted_data);
     extracted_data = keepTopFive(extracted_data);
 
-    cb( extracted_data );
+    cb( pdf_text, extracted_data );
 }
 
 function keepTopFive (data) {
@@ -99,6 +99,11 @@ function cleanup_extracted_data ( d ) {
         var r = {};
         r.match = key;
         r.value = value.g1;
+        if ( r.value === '$' ) {
+            r.value = 'USD';
+        } else if ( r.value === '€' ) {
+            r.value = 'EUR';
+        }
         r.position = value.i;
         waehrung_rv.push( r );
     }
@@ -122,7 +127,7 @@ function cleanup_extracted_data ( d ) {
     for (const p of Object.entries(d.rg_nummer)) {
         var key   = p[0];
         // check if key contains keywords like datum, date, ...
-        if ( /datum|date|betrag|per.|konto|amount|ean|total|periode|kunde/gi.test(key) ) {
+        if ( /datum|date|betrag|adr|waren|empf|per.|konto|amount|ean|total|periode|kunde/gi.test(key) ) {
             continue;
         }
         var value = p[1];
@@ -243,7 +248,8 @@ function cleanup_extracted_data ( d ) {
     d.esr_konto     = esr_konto_rv;
 
     // falls währung noch leer setzen wir sie hier auf CHF wegen dem ESR
-    if ( d.waehrung.length == 0 ) {
+    if ( d.waehrung.length == 0 || d.esr_referenz.length != 0 ) {
+        d.waehrung = [];
         d.waehrung.push( { match:"CHF", position:0, value:"CHF" } );
     }
 
@@ -328,12 +334,12 @@ function extractRegex( str ) {
     var pattern_seiten = /---------- (\d{1,5}) ----------/gim;
     var pattern_rechnungsart = /(?:\b(?:Ausgangs)?(R)(?:echnung))|(?:\b(R)(?:g\.\b))|(?:\b(R)g\b)|(?:\b(I)nvoice)|(?:\bFaktu(r)a)|(?:\bFactu(r)e)|(?:\b(G)utschrift)|(?:\b(C)redit note)|(?:\b(c)rédit)/gim;
     var pattern_mwst = /((?:(?:CHE)(?:-|\s)?)\d{3}(?:\.|\s)?\d{3}(?:\.|\s)?\d{3})(?: |\t)?/gim;
-    var pattern_waehrung = /(\bCHF\b)|(\bEUR\b)|(\bUSD\b)|(\bGBP\b)/gim;
+    var pattern_waehrung = /(\bCHF\b)|(\bEUR\b)|(\bUSD\b)|(\bGBP\b)|(€)|(\$)/gim;
     var pattern_iban = /\b((?:CH|HR|LI|LV) ?[0-9]{2}(?:[ ]?[a-zA-Z0-9]{4}){4}(?:[ ]?[a-zA-Z0-9]{1}))|((?:BG|BH|CR|DE|GB|GE|IE|ME|RS|VA) ?[0-9]{2}(?:[ ]?[a-zA-Z0-9]{4}){4}(?:[ ]?[a-zA-Z0-9]{2}))|((?:NO) ?[0-9]{2}(?:[ ]?[a-zA-Z0-9]{4}){2}(?:[ ]?[a-zA-Z0-9]{3}))|((?:BE|BI) ?[0-9]{2}(?:[ ]?[a-zA-Z0-9]{4}){3})|((?:DK|FI|FO|GL|NL) ?[0-9]{2}(?:[ ]?[a-zA-Z0-9]{4}){3}(?:[ ]?[a-zA-Z0-9]{2}))|((?:MK|SI) ?[0-9]{2}(?:[ ]?[a-zA-Z0-9]{4}){3}(?:[ ]?[a-zA-Z0-9]{3}))|((?:AT|BA|EE|KZ|LT|LU|XK) ?[0-9]{2}(?:[ ]?[a-zA-Z0-9]{4}){4})|((?:AE|GI|IL|IQ|TL) ?[0-9]{2}(?:[ ]?[a-zA-Z0-9]{4}){4}(?:[ ]?[a-zA-Z0-9]{3}))|((?:AD|CZ|DZ|ES|MD|PK|RO|SA|SE|SK|TN|VG) ?[0-9]{2}(?:[ ]?[a-zA-Z0-9]{4}){5})|((?:AO|CV|MZ|PT|ST) ?[0-9]{2}(?:[ ]?[a-zA-Z0-9]{4}){5}(?:[ ]?[a-zA-Z0-9]{1}))|((?:IR|IS|TR) ?[0-9]{2}(?:[ ]?[a-zA-Z0-9]{4}){5}(?:[ ]?[a-zA-Z0-9]{2}))|((?:BF|CF|CG|CM|EG|FR|GA|GR|IT|MC|MG|MR|SM) ?[0-9]{2}(?:[ ]?[a-zA-Z0-9]{4}){5}(?:[ ]?[a-zA-Z0-9]{3}))|((?:AL|AZ|BJ|BY|CI|CY|DO|GT|HU|LB|ML|PL|SN|SV) ?[0-9]{2}(?:[ ]?[a-zA-Z0-9]{4}){6})|((?:BR|PS|QA|UA) ?[0-9]{2}(?:[ ]?[a-zA-Z0-9]{4}){6}(?:[ ]?[a-zA-Z0-9]{1}))|((?:JO|KW|MU) ?[0-9]{2}(?:[ ]?[a-zA-Z0-9]{4}){6}(?:[ ]?[a-zA-Z0-9]{2}))|((?:MT|SC) ?[0-9]{2}(?:[ ]?[a-zA-Z0-9]{4}){6}(?:[ ]?[a-zA-Z0-9]{3}))|((?:LC) ?[0-9]{2}(?:[ ]?[a-zA-Z0-9]{4}){7})\b/gm;
-    var pattern_esr_betrag  = /(\d{13})>/gim;
+    var pattern_esr_betrag = /(\d{13})>/gim;
     var pattern_esr_konto = /(?:\D)(0(?:1|3)\d{7})>/gim;
-    var pattern_esr_referenz  = /(\d{5,27})\+/gim;
-    var pattern_esr_mit_betrag  = /(?:\s|\D|^)(\d{13})>(\d{5,27})\+\s{0,3}(\d{9})>/gim;
+    var pattern_esr_referenz = /(\d{5,27})\+/gim;
+    var pattern_esr_mit_betrag = /(?:\s|\D|^)(\d{13})>(\d{5,27})\+\s{0,3}(\d{9})>/gim;
     var pattern_esr_ohne_betrag = /(?:\s|\D|^)(\d{3})>(\d{5,27})\+\s{0,3}(\d{9})>/gim;
     // datum_dirty_ddmmyy allows whitespace as separators between numbers
     var pattern_datum_dirty_ddmmyy = /\b(31)(?:\/|-|\.|\040)\D?((?:0?[13578]|1[02])|(?:januar|jan|january|janvier|März|mär|mar|Marz|march|mars|Mai|may|Juli|jul|july|juillet|august|aug|aout|août|oktober|okt|october|octobre|dezember|dez|december|décembre|decembre))(?:\/|-|\.|\040)((?:20)?\d{2})\b|\b(29|30)(?:\/|-|\.|\040)\D?((?:0?[1,3-9]|1[0-2])|(?:januar|jan|january|janvier|März|mär|mar|Marz|march|mars|April|apr|avril|Mai|may|Juni|jun|june|juin|Juli|jul|july|juillet|august|aug|aout|août|september|sep|sept|septembre|oktober|okt|october|octobre|november|nov|novembre|dezember|dez|december|décembre|decembre))(?:\/|-|\.|\040)\D?((?:20)?\d{2})\b|\b(29)(?:\/|-|\.|\040)\D?(0?2|(februar|febr?|february|février))\D?(?:\/|-|\.|\040)\D?((?:(?:20)?(?:0[48]|[2468][048]|[13579][26])|((16|[2468][048]|[3579][26])00)))\b|\b(0?[1-9]|1\d|2[0-8])\D?(?:\/|-|\.|\040)\D?((?:0?[1-9])|(?:1[0-2])|(?:\ |\t)?(?:januar|jan|january|janvier|februar|febr?|february|février|März|mär|mar|Marz|march|mars|April|apr|avril|Mai|may|Juni|jun|june|juin|Juli|jul|july|juillet|august|aug|aout|août|september|sep|sept|septembre|oktober|okt|october|octobre|november|nov|novembre|dezember|dez|december|décembre|decembre))\D?(?:\/|-|\.|\040)\D?((?:20)?\d{2})\b/gim;
@@ -344,7 +350,7 @@ function extractRegex( str ) {
 
     var pattern_email = /\b((?:(?:[^<>()\[\]\\.,;:\s@"]+(?:\.[^<>()\[\]\\.,;:\s@"]+)*)|(?:".+"))@(?:(?:\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(?:(?:[a-zA-Z\-0-9]+(?:\.))+[a-zA-Z]{2,})))\b/gim;
     var pattern_endbetrag = /(?:rechnungstotal|gesamtsumme|summe|amount|gesamtbetrag|total|invoicetotal|betrag|chf|sfr|fr\.|eur|usd|gbp|\$|€|brutto)(?:\s|\D){1,20}((?:\d{1,3}(?:\'|\’|\.|\,|\s)?)?(?:\d{1,3}(?:(?:\'|\.|\,|\ )\d{2})))(?!%|\d)/gim;
-    var pattern_rechnungsnummer = /(?:(?:rechnung|Rechn|faktura|facture|invoice|Gutschrift|credit note)(?:\d|\D)?(?:\n)?(?:nummer|number|nr\.|Nr):?\s?(\d{2,16}))|(?:(?:Rechnung|Rechn|faktura|facture|invoice)(?:\D{1,16})?(\d+(?:\.|\'|-)?\d+))|(?:(?:Rechnung|faktura|facture|invoice|Gutschrift|credit note)(?:\D{1,16})?(?:\n)?(?:\D{1,6})?(?:\n)?(\d{2,16}))/gim;
+    var pattern_rechnungsnummer = /(?:(?:rechnung|Rechn|faktura|Beleg|facture|invoice|Gutschrift|credit note)(?:\d|\D)?(?:\n)?(?:nummer|number|nr\.|Nr):?\s?(\d{2,16}))|(?:(?:Rechnung|Rechn|faktura|facture|invoice)(?:\D{1,16})?(\d+(?:\.|\'|-)?\d+))|(?:(?:Rechnung|faktura|facture|beleg|invoice|Gutschrift|credit note)(?:\D{1,16})?(?:\n)?(?:\D{1,6})?(?:\n)?(\d{2,16}))/gim;
 
     /*
      * Output of this function
@@ -466,7 +472,7 @@ function parseJSON( data ) {
     for ( var p = 0 ; p < pages.length ; p++ ) {
         out += '\n---------- ' + (p+1) + ' ----------\n'
         var content = pages[p].content;
-        //content = sortContent(content);
+        content = sortContent(content);
         for ( var i = 0 ; i < content.length; i++ ) {
             if ( i == 0 ) {
                 out += pages[0].content[0].str;
@@ -499,7 +505,7 @@ function keepAlpha( str ) {
 function sortContent( c ) {
     c.sort( function ( a, b ) {
         // same line
-        if ( Math.abs(a.y - b.y) < 5.0 ) {
+        if ( Math.abs((a.y + a.height/2) - (b.y + b.height/2)) < 5.0 ) {
             return a.x - b.x;
         } else {
             return a.y - b.y;
@@ -510,7 +516,16 @@ function sortContent( c ) {
 
 // Helper function
 function appendText( text, prevEl, newEl ) {
-    text += ' ' + newEl.str;
+    if ( Math.abs((prevEl.y + prevEl.height/2) - (newEl.y + newEl.height/2)) < 5.0 ) {
+        if ( Math.abs( prevEl.x + prevEl.width - newEl.x) > 0.5 ) {
+            text += ' ' + newEl.str;
+        } else {
+            text += newEl.str;
+        }
+    } else {
+        text += '\n';
+        text += newEl.str;
+    }
     return text;
 }
 

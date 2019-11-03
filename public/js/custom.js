@@ -15,6 +15,15 @@ function PDF ( filepath, extracted_data ) {
     this.extracted_data = extracted_data;
 }
 
+// Register keyboard shortcuts
+window.addEventListener('keyup', function (e) {
+    if (e.ctrlKey  &&  e.key.toLowerCase() === "n") {
+        nextPDF( 1 );
+    } else if (e.ctrlKey  &&  e.key.toLowerCase() === "b") {
+        nextPDF( -1 );
+    }
+});
+
 function extractJsonFromPDF ( inputfile, cb ) {
     const pdfExtract = new PDFExtract();
     const options = {};
@@ -52,9 +61,12 @@ function registerDropAreaEvent() {
     });
 }
 
-function nextPDF() {
+function nextPDF( plusMinusOne ) {
     if ( pdf_queue.length > 0 ) {
-        pdf_queue_index += 1;
+        pdf_queue_index += plusMinusOne;
+        if ( pdf_queue_index < 0 ) {
+            pdf_queue_index = pdf_queue.length - 1;
+        }
         pdf_queue_index = pdf_queue_index % pdf_queue.length;
         var next_pdf = pdf_queue[ pdf_queue_index ];
         PDFViewerApplication.open( next_pdf.filepath );
@@ -72,7 +84,7 @@ function deletePDFFromQueue() {
     if ( pdf_queue_index >= 1 ) {
         pdf_queue_index -= 1;
     }
-    nextPDF();
+    nextPDF( -1 );
 }
 
 function update_button_load_next_pdf () {

@@ -83,7 +83,7 @@ const exec = require("child_process").exec;
 const fs = require('fs');
 
 // Constants
-const OCRMYPDF = true;
+const OCRMYPDF = false;
 const DEBUG = true;
 const q = new Queue();
 var running_jobs_count = 0;

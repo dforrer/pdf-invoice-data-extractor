@@ -51,7 +51,7 @@ var csvHeader = [];
 var suppliers = [];
 
 const rl = readline.createInterface({
-    input: fs.createReadStream('/Users/admin/Desktop/KREDBAN_2019_11_02_utf8.csv'),
+    input: fs.createReadStream('/Users/admin/Desktop/KREDBAN_2019_11_03.csv'),
     crlfDelay: Infinity
 });
 
@@ -66,7 +66,10 @@ rl.on( 'line', (line) => {
         s[csvHeader[i]] = entry[i];
     }
     var supplier = new Supplier(s);
-    //console.log(supplier);
+    // if (lineCounter < 5) {
+    //     console.log(s);
+    //     console.log(supplier);
+    // }
     suppliers.push(supplier);
 });
 
@@ -183,7 +186,7 @@ function cleanup_extracted_data ( d ) {
     for (const p of Object.entries(d.endbetrag)) {
         var key = p[0];
         // check if key contains keywords like datum, date, ...
-        if ( /exk|innert (10|14|15|20|30)|zwischensumme/gi.test(key) ) {
+        if ( /exk|innert (10|14|15|20|30)|liefer|zwischensumme/gi.test(key) ) {
             continue;
         }
         var value = p[1];
@@ -463,7 +466,7 @@ function extractRegex( str ) {
     var pattern_referenz = /TODO/gim;
 
     var pattern_email = /\b((?:(?:[^<>()\[\]\\.,;:\s@"]+(?:\.[^<>()\[\]\\.,;:\s@"]+)*)|(?:".+"))@(?:(?:\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(?:(?:[a-zA-Z\-0-9]+(?:\.))+[a-zA-Z]{2,})))\b/gim;
-    var pattern_endbetrag = /(?:rechnungstotal|gesamtsumme|summe|amount|gesamtbetrag|total|invoicetotal|betrag|chf|sfr|fr\.|eur|usd|gbp|\$|€|brutto)(?:\s|\D){1,20}((?:\d{1,3}(?:\'|\’|\.|\,|\s)?)?(?:\d{1,3}(?:(?:\'|\.|\,|\ )\d{2})))(?!%|\d)/gim;
+    var pattern_endbetrag = /(?:rechnungstotal|gesamtsumme|summe|amount|gesamtbetrag|total|invoicetotal|betrag|chf|sfr|fr\.|eur|usd|gbp|\$|€|brutto)(?:\s|\D){1,20}((?:\d{1,3}(?:\'|\’|\.|\,|\s)?)?(?:\d{1,3}(?:(?:\'|\.|\,|\ )?(?:\d{2}|-)?)))(?!%|\d)/gim;
     var pattern_rechnungsnummer = /(?:(?:rechnung|Rechn|faktura|Beleg|facture|invoice|Gutschrift|credit note)(?:\d|\D)?(?:\n)?(?:nummer|number|nr\.|Nr):?\s?(\d{2,16}))|(?:(?:Rechnung|Rechn|faktura|facture|invoice)(?:\D{1,16})?(\d+(?:\.|\'|-)?\d+))|(?:(?:Rechnung|faktura|facture|beleg|invoice|Gutschrift|credit note)(?:\D{1,16})?(?:\n)?(?:\D{1,6})?(?:\n)?(\d{2,16}))/gim;
 
     /*

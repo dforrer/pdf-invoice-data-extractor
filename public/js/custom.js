@@ -90,9 +90,9 @@ function deletePDFFromQueue() {
 function update_button_load_next_pdf () {
     var el = document.getElementById('load_next_pdf');
     if (pdf_queue.length > 0) {
-        el.innerHTML = "Nächstes PDF laden (" + (pdf_queue_index + 1) + "/" +  pdf_queue.length + ")";
+        el.innerHTML = "Next (" + (pdf_queue_index + 1) + "/" +  pdf_queue.length + ")";
     } else {
-        el.innerHTML = "Nächstes PDF laden (0/0)";
+        el.innerHTML = "Next (0/0)";
     }
 }
 

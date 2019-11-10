@@ -132,6 +132,16 @@ function addSupplierToExtractedData ( extracted_data ) {
         }
     }
 
+    extracted_data.kreditor = [{
+        match: '',
+        value: '',
+        position: 0
+    }];
+    extracted_data.name = [{
+        match: '',
+        value: '',
+        position: 0
+    }];
     return extracted_data;
 }
 
@@ -381,6 +391,10 @@ function cleanup_extracted_data ( d ) {
 
     if ( d.esr_konto.length == 0 ) {
         d.esr_referenz = [];
+    }
+
+    if ( d.endbetrag.length > 0 ) {
+        d.endbetrag[0].value = d.endbetrag[0].value.toFixed(2);
     }
 
     // delete elements

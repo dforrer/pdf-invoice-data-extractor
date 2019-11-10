@@ -70,7 +70,7 @@ function nextPDF( plusMinusOne ) {
         pdf_queue_index = pdf_queue_index % pdf_queue.length;
         var next_pdf = pdf_queue[ pdf_queue_index ];
         PDFViewerApplication.open( next_pdf.filepath );
-        iterateAttribues( next_pdf.extracted_data );
+        fillExtractorSidebar( next_pdf.extracted_data );
     } else {
         PDFViewerApplication.close();
         removeInputsFromExtractorContainer();
@@ -116,7 +116,7 @@ function loadJSONData() {
       .then(data => {
         // Work with JSON data here
         delete data.seiten;
-        iterateAttribues(data);
+        fillExtractorSidebar(data);
       })
       .catch(err => {
         // Do something for an error here
@@ -132,33 +132,17 @@ function removeInputsFromExtractorContainer() {
     }
 }
 
-function iterateAttribues ( json ) {
+function fillExtractorSidebar ( json ) {
     removeInputsFromExtractorContainer();
-    for (const p of Object.entries( json )) {
-        var key   = p[0];
-        var matchArray = p[1];
-        switch ( key ) {
-            case 'mwst':
-            case 'iban':
-            case 'email':
-            case 'esr_betrag':
-                continue;
-            case 'rg_nummer':
-                key = 'Rg. Nummer'
-                break;
-            case 'rg_datum':
-                key = 'Rg. Datum'
-                break;
-            case 'esr_konto':
-                key = 'ESR Konto'
-                break;
-            case 'esr_referenz':
-                key = 'ESR Referenz'
-                break;
-            default:
-        }
-        addInputDiv ( key, matchArray[0]);
-    }
+    addInputDiv ( 'Rechnungsart', json.rechnungsart[0] );
+    addInputDiv ( 'Kreditor', json.kreditor[0] );
+    addInputDiv ( 'Name', json.name[0] );
+    addInputDiv ( 'Rg. Nummer', json.rg_nummer[0] );
+    addInputDiv ( 'Rg. Datum', json.rg_datum[0] );
+    addInputDiv ( 'Währung', json.waehrung[0] );
+    addInputDiv ( 'Endbetrag', json.endbetrag[0] );
+    addInputDiv ( 'ESR Konto', json.esr_konto[0] );
+    addInputDiv ( 'ESR Referenz', json.esr_referenz[0] );
 }
 
 function addInputDiv ( name, match ) {

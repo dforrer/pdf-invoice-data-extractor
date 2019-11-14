@@ -13,6 +13,7 @@ var viewerSpans  = []; // Array of all the span-elements inside the viewer div
 var isMouseDown  = false;
 var mouseDownCache = ''; // string to store the content of the current selection
 var previousTarget = null;
+var focusedInput   = null;
 
 // Object declarations
 function PDF ( filepath, extracted_data ) {
@@ -48,7 +49,7 @@ function dblclickHandler (e) {
     }
     previousTarget = e.target;
     if ( mouseDownCache.length > 0 ) {
-        console.log( mouseDownCache );
+        focusedInput.value = mouseDownCache;
     }
 }
 
@@ -89,7 +90,7 @@ function mouseupHandlerViewer ( e ) {
     isMouseDown = false;
     mouseDownCache = mouseDownCache.trim();
     if ( mouseDownCache.length > 0 ) {
-        console.log( mouseDownCache );
+        focusedInput.value = mouseDownCache;
     }
 }
 
@@ -244,7 +245,8 @@ function addInputDiv ( name, match ) {
     span.innerHTML = name;
 
     var input = document.createElement('input');
-    input.setAttribute('Id', 'div_'+name);
+    var inputname = 'input_' + name.toLowerCase();
+    input.setAttribute( 'Id', inputname );
     input.type = 'text';
     input.readonly = true;
     if ( match ) {
@@ -252,6 +254,10 @@ function addInputDiv ( name, match ) {
         input.ondblclick = function() { searchPDF(match.match);
         }
     }
+    input.addEventListener( 'focus', function ( e ) {
+        focusedInput = e.target;
+    });
+
     // Putting it all together
     label.appendChild(span);
     div_field.appendChild(label);

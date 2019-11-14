@@ -6,10 +6,15 @@ var userSearch   = true;
 var textDivs_ref = undefined;
 var begin_divIdx = undefined;
 var end_divIdx   = undefined;
-
 var pdf_queue    = [];
 var pdf_queue_index = 0;
+var viewer       = null; // div 'viewer' reference from PDFViewerApplication
+var viewerSpans  = []; // Array of all the span-elements inside the viewer div
+var isMouseDown  = false;
+var mouseDownCache = ''; // string to store the content of the current selection
+var previousTarget = null;
 
+// Object declarations
 function PDF ( filepath, extracted_data ) {
     this.filepath = filepath;
     this.extracted_data = extracted_data;
@@ -23,6 +28,83 @@ window.addEventListener('keyup', function (e) {
         nextPDF( -1 );
     }
 });
+
+/* Here we listen for the custom event from viewer.js */
+document.addEventListener('pdf_finished_rendering', function (e) {
+    console.log('pages loaded');
+    registerSpanOnMouseOver();
+}, true);
+
+function mousemoveHandler ( e ) {
+    if ( isMouseDown && e.target !== previousTarget ) {
+        mouseDownCache += ' ' + e.target.innerText;
+    }
+    previousTarget = e.target;
+}
+
+function dblclickHandler (e) {
+    if ( e.target !== previousTarget ) {
+        mouseDownCache += e.target.innerText;
+    }
+    previousTarget = e.target;
+    if ( mouseDownCache.length > 0 ) {
+        console.log( mouseDownCache );
+    }
+}
+
+function addSpanEventListener () {
+    for ( var i = 0; i < viewerSpans.length; i++) {
+        viewerSpans[i].addEventListener( 'mousemove', mousemoveHandler );
+        viewerSpans[i].addEventListener( 'dblclick', dblclickHandler );
+    }
+}
+
+function removeSpanEventListener () {
+    for ( var i = 0; i < viewerSpans.length; i++) {
+        viewerSpans[i].removeEventListener( 'mousemove', mousemoveHandler );
+        viewerSpans[i].removeEventListener( 'dblclick', dblclickHandler );
+    }
+}
+
+function registerSpanOnMouseOver() {
+    removeSpanEventListener();
+    viewerSpans = Array.from(viewer.getElementsByTagName('span'));
+    addSpanEventListener();
+}
+
+function getPosition( e ) {
+    var rect = viewer.getBoundingClientRect();
+    var x = e.clientX - rect.left;
+    var y = e.clientY - rect.top;
+    return { x,y }
+}
+
+function mousedownHandlerViewer ( e ) {
+    isMouseDown = true;
+    mouseDownCache = "";
+    previousTarget = null;
+}
+
+function mouseupHandlerViewer ( e ) {
+    isMouseDown = false;
+    mouseDownCache = mouseDownCache.trim();
+    if ( mouseDownCache.length > 0 ) {
+        console.log( mouseDownCache );
+    }
+}
+
+function unregisterMouseEvents () {
+    if ( viewer ) {
+        viewer.removeEventListener( 'mousedown', mousedownHandlerViewer );
+        viewer.removeEventListener( 'mouseup', mouseupHandlerViewer );
+    }
+}
+
+function registerMouseEvents () {
+    viewer = document.getElementById( 'viewer' );
+    viewer.addEventListener( 'mousedown', mousedownHandlerViewer );
+    viewer.addEventListener( 'mouseup', mouseupHandlerViewer );
+}
 
 function extractJsonFromPDF ( inputfile, cb ) {
     const pdfExtract = new PDFExtract();
@@ -62,6 +144,10 @@ function registerDropAreaEvent() {
 }
 
 function nextPDF( plusMinusOne ) {
+    unregisterMouseEvents();
+    removeSpanEventListener();
+    PDFViewerApplication.close();
+    removeInputsFromExtractorContainer();
     if ( pdf_queue.length > 0 ) {
         pdf_queue_index += plusMinusOne;
         if ( pdf_queue_index < 0 ) {
@@ -71,9 +157,7 @@ function nextPDF( plusMinusOne ) {
         var next_pdf = pdf_queue[ pdf_queue_index ];
         PDFViewerApplication.open( next_pdf.filepath );
         fillExtractorSidebar( next_pdf.extracted_data );
-    } else {
-        PDFViewerApplication.close();
-        removeInputsFromExtractorContainer();
+        registerMouseEvents();
     }
     update_button_load_next_pdf();
 }
@@ -143,6 +227,7 @@ function fillExtractorSidebar ( json ) {
     addInputDiv ( 'Endbetrag', json.endbetrag[0] );
     addInputDiv ( 'ESR Konto', json.esr_konto[0] );
     addInputDiv ( 'ESR Referenz', json.esr_referenz[0] );
+    addInputDiv ( 'Email', json.email[0] );
 }
 
 function addInputDiv ( name, match ) {

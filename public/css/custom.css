@@ -1,4 +1,21 @@
 /*
+ * added by dforrer
+ * disables text selection
+ */
+#viewer {
+    user-select: none;
+   -o-user-select:none;
+   -moz-user-select: none;
+   -khtml-user-select: none;
+   -webkit-user-select: none;
+}
+
+.textLayer > span:hover {
+    border: 1px solid black;
+    z-index: 1;
+}
+
+/*
 * edited by dforrer
 */
 #outerContainer {

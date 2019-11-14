@@ -12373,6 +12373,11 @@ function () {
         this.textLayerDiv.appendChild(endOfContent);
       }
 
+      /* BEGIN added code by dforrer */
+      var eventCustom = new Event('pdf_finished_rendering');
+      document.dispatchEvent(eventCustom);
+      /* END added code by dforrer */
+      
       this.eventBus.dispatch('textlayerrendered', {
         source: this,
         pageNumber: this.pageNumber,

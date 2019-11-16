@@ -32,7 +32,6 @@ window.addEventListener('keyup', function (e) {
 
 /* Here we listen for the custom event from viewer.js */
 document.addEventListener('pdf_finished_rendering', function (e) {
-    console.log('pages loaded');
     registerSpanOnMouseOver();
 }, true);
 
@@ -74,13 +73,6 @@ function registerSpanOnMouseOver() {
     addSpanEventListener();
 }
 
-function getPosition( e ) {
-    var rect = viewer.getBoundingClientRect();
-    var x = e.clientX - rect.left;
-    var y = e.clientY - rect.top;
-    return { x,y }
-}
-
 function mousedownHandlerViewer ( e ) {
     isMouseDown = true;
     mouseDownCache = "";
@@ -107,16 +99,6 @@ function registerMouseEvents () {
     viewer = document.getElementById( 'viewer' );
     viewer.addEventListener( 'mousedown', mousedownHandlerViewer );
     viewer.addEventListener( 'mouseup', mouseupHandlerViewer );
-}
-
-function extractJsonFromPDF ( inputfile, cb ) {
-    const pdfExtract = new PDFExtract();
-    const options = {};
-
-    pdfExtract.extract(inputfile, options, (err, data) => {
-        if (err) return console.log(err);
-        cb(err, data);
-    });
 }
 
 function setupIPC() {

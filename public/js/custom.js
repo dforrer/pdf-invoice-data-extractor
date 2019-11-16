@@ -50,6 +50,7 @@ function dblclickHandler (e) {
     previousTarget = e.target;
     if ( mouseDownCache.length > 0 ) {
         focusedInput.value = mouseDownCache;
+        focusedInput.focus();
     }
 }
 
@@ -91,6 +92,7 @@ function mouseupHandlerViewer ( e ) {
     mouseDownCache = mouseDownCache.trim();
     if ( mouseDownCache.length > 0 ) {
         focusedInput.value = mouseDownCache;
+        focusedInput.focus();
     }
 }
 

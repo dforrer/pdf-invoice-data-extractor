@@ -2,18 +2,18 @@
 const { ipcRenderer } = require('electron');
 
 // Global variables
-var userSearch   = true;
-var textDivs_ref = undefined;
-var begin_divIdx = undefined;
-var end_divIdx   = undefined;
-var pdf_queue    = [];
+var userSearch      = true;
+var textDivs_ref    = undefined;
+var begin_divIdx    = undefined;
+var end_divIdx      = undefined;
+var pdf_queue       = [];
 var pdf_queue_index = 0;
-var viewer       = null; // div 'viewer' reference from PDFViewerApplication
-var viewerSpans  = []; // Array of all the span-elements inside the viewer div
-var isMouseDown  = false;
-var mouseDownCache = ''; // string to store the content of the current selection
-var previousTarget = null;
-var focusedInput   = null;
+var viewer          = null; // div 'viewer' reference from PDFViewerApplication
+var viewerSpans     = []; // Array of all the span-elements inside the viewer div
+var isMouseDown     = false;
+var mouseDownCache  = ''; // string to store the content of the current selection
+var previousTarget  = null;
+var focusedInput    = null;
 
 // Object declarations
 function PDF ( filepath, extracted_data ) {

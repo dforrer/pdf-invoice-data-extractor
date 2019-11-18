@@ -15,9 +15,7 @@
     z-index: 1;
 }
 
-/*
-* edited by dforrer
-*/
+/* contains the pdf viewer */
 #outerContainer {
     position: absolute;
     top: 0px;
@@ -25,15 +23,12 @@
     left: 0px;
     right: 430px;
 }
-
-/*
-* added by dforrer
-*/
+/* right sidebar */
 #extractorContainer {
     /* overflow: hidden; */
     position: absolute;
     top: 0px;
-    bottom: 0;
+    bottom: 0px;
     right: 0px;
     width: 430px; /* Here, and elsewhere below, keep the constant value for compatibility
     with older browsers that lack support for CSS variables. */
@@ -49,6 +44,22 @@
     flex-direction: column;
     align-items: center; */
 }
+
+/* extracted fields inside extractorContainer */
+#extracted_data {
+    position: absolute;
+    top: 0px;
+    bottom: 210px;
+    left: 0px;
+    right: 0px;
+    overflow-y: scroll;
+}
+
+#extracted_data::-webkit-scrollbar {
+    display: none;
+}
+
+
 .register,
 .register:before,
 .register:after {

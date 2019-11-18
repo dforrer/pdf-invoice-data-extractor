@@ -21,6 +21,16 @@ function PDF ( filepath, extracted_data ) {
     this.extracted_data = extracted_data;
 }
 
+// utility functions
+
+/*
+ * Functions to whitelist a string
+ */
+function removeChars( validChars, inputString, flags ) {
+    var regex = new RegExp( '[^' + validChars + ']', flags );
+    return inputString.replace( regex, '' );
+}
+
 // Register keyboard shortcuts
 window.addEventListener('keyup', function (e) {
     if (e.ctrlKey  &&  e.key.toLowerCase() === "n") {
@@ -50,6 +60,7 @@ function dblclickHandler (e) {
     if ( mouseDownCache.length > 0 ) {
         focusedInput.value = mouseDownCache;
         focusedInput.focus();
+        console.log( e.target );
     }
 }
 
@@ -108,23 +119,27 @@ function setupIPC() {
         delete newPDF.extracted_data.seiten;
         pdf_queue.push( newPDF );
         update_button_load_next_pdf();
+        if ( PDFViewerApplication.pdfDocument == null ) {
+            pdf_queue_index = -1;
+            nextPDF( 1 );
+        }
     });
 }
 
 function registerDropAreaEvent() {
     document.getElementById('pdf_drop_area').addEventListener('drop', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
+        e.preventDefault();
+        e.stopPropagation();
 
-      for (const f of e.dataTransfer.files) {
-        console.log('File(s) you dragged here: ', f.path)
-        var newPDF = new PDF( f.path, undefined );
-        ipcRenderer.send( 'extract-data-from-pdf', newPDF );
-      }
+        for (const f of e.dataTransfer.files) {
+            console.log('File(s) you dragged here: ', f.path)
+            var newPDF = new PDF( f.path, undefined );
+            ipcRenderer.send( 'extract-data-from-pdf', newPDF );
+        }
     });
     document.getElementById('pdf_drop_area').addEventListener('dragover', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
+        e.preventDefault();
+        e.stopPropagation();
     });
 }
 
@@ -201,21 +216,78 @@ function removeInputsFromExtractorContainer() {
     }
 }
 
+function validate_rechnungsart ( e ) {
+    if ( 'R' === e.target.value.toUpperCase() || /rechnung|rg|invoice|faktur|factur/gi.test( e.target.value ) ) {
+        e.target.value = 'R';
+    } else if ('G' === e.target.value.toUpperCase() || /gutschrift|credit note|credit|crédit/gi.test( e.target.value ) ) {
+        e.target.value = 'G';
+    } else {
+        // default value
+        e.target.value = 'R';
+    }
+}
+
+function validate_waehrung ( e ) {
+    e.target.value = e.target.value.replace(/ /gm, '');
+    if ( /chf|sfr/gi.test( e.target.value ) ) {
+        e.target.value = 'CHF';
+    } else if ( /eur|€/gi.test( e.target.value ) ) {
+        e.target.value = 'EUR';
+    } else if ( /usd|\$/gi.test( e.target.value ) ) {
+        e.target.value = 'USD';
+    } else if ( /gbp|£/gi.test( e.target.value ) ) {
+        e.target.value = 'GBP';
+    } else {
+        // default value
+        //e.target.value = 'CHF';
+    }
+}
+
+function validate_endbetrag ( e ) {
+    var output = e.target.value;
+    // remove whitespace from front and end
+    output = output.trim();
+    outputSplit = output.split('');
+    if ( outputSplit[ outputSplit.length - 2 ] == ' ' ) {
+        outputSplit.splice( outputSplit.length - 2);
+    }
+    output = outputSplit.join('');
+    // replace all non-digits (commas, dots, upticks) with dots
+    output = output.replace(/\D/g, '.');
+    // replace all but the last dot with nothing
+    output = parseFloat( output.replace(/\.(?![^.]+$)|[^0-9.]/g, ''));
+    e.target.value = output.toFixed(2);
+}
+
+function validate_esr_konto ( e ) {
+    var whitelist = '1234567890-';
+    var flags = 'gm';
+    e.target.value = removeChars( whitelist, e.target.value, flags );
+}
+
+function validate_esr_referenz ( e ) {
+    var whitelist = '1234567890';
+    var flags = 'gm';
+    e.target.value = removeChars( whitelist, e.target.value, flags );
+}
+
 function fillExtractorSidebar ( json ) {
     removeInputsFromExtractorContainer();
-    addInputDiv ( 'Rechnungsart', json.rechnungsart[0] );
+    addInputDiv ( 'Rechnungsart', json.rechnungsart[0], validate_rechnungsart);
     addInputDiv ( 'Kreditor', json.kreditor[0] );
     addInputDiv ( 'Name', json.name[0] );
     addInputDiv ( 'Rg. Nummer', json.rg_nummer[0] );
     addInputDiv ( 'Rg. Datum', json.rg_datum[0] );
-    addInputDiv ( 'Währung', json.waehrung[0] );
-    addInputDiv ( 'Endbetrag', json.endbetrag[0] );
-    addInputDiv ( 'ESR Konto', json.esr_konto[0] );
-    addInputDiv ( 'ESR Referenz', json.esr_referenz[0] );
+    addInputDiv ( 'Währung', json.waehrung[0], validate_waehrung );
+    addInputDiv ( 'Endbetrag', json.endbetrag[0], validate_endbetrag );
+    addInputDiv ( 'ESR Konto', json.esr_konto[0], validate_esr_konto );
+    addInputDiv ( 'ESR Referenz', json.esr_referenz[0], validate_esr_referenz );
+    addInputDiv ( 'MwSt-Nr.', json.mwst[0] );
+    addInputDiv ( 'IBAN', json.iban[0] );
     addInputDiv ( 'Email', json.email[0] );
 }
 
-function addInputDiv ( name, match ) {
+function addInputDiv ( name, match, onBlurFunction ) {
     var div_register = document.createElement('div');
     div_register.setAttribute('class', 'register');
 
@@ -241,6 +313,9 @@ function addInputDiv ( name, match ) {
     input.addEventListener( 'focus', function ( e ) {
         focusedInput = e.target;
     });
+
+    // validate input on blur
+    input.addEventListener( 'blur', onBlurFunction );
 
     // Putting it all together
     label.appendChild(span);

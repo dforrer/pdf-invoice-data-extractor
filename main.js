@@ -10,9 +10,9 @@ function createWindow () {
   // Create the browser window.
   mainWindow = new BrowserWindow({
     width: 1200,
-    height: 1000,
+    height: 800,
     minWidth: 1100,
-    minHeight: 1000,
+    minHeight: 800,
     frame: true,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -119,6 +119,12 @@ function schedule_job() {
 function extract_pdf ( nextEl ) {
     pdfExtract.extract( nextEl.pdf.filepath, options, (err, data) => {
         if (err) return console.log(err);
+        if ( DEBUG ) {
+            // write file to disk
+            fs.writeFile( nextEl.pdf.filepath + '.json', JSON.stringify(data), 'utf8', (err) => {
+                if (err) throw err;
+            });
+        }
         parser.parseJsonAndExport( data,
             function(pdf_text, extracted_data) {
                 nextEl.pdf.extracted_data = extracted_data;

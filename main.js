@@ -84,7 +84,7 @@ const fs = require('fs');
 
 // Constants
 const OCRMYPDF = false;
-const DEBUG = true;
+const DEBUG = false;
 const q = new Queue();
 var running_jobs_count = 0;
 

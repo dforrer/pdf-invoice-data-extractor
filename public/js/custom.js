@@ -1,5 +1,6 @@
 // Requirements
 const { ipcRenderer } = require('electron');
+const validators = require('./js/validators.js');
 
 // Global variables
 var userSearch      = true;
@@ -23,13 +24,6 @@ function PDF ( filepath, extracted_data ) {
 
 // utility functions
 
-/*
- * Functions to whitelist a string
- */
-function removeChars( validChars, inputString, flags ) {
-    var regex = new RegExp( '[^' + validChars + ']', flags );
-    return inputString.replace( regex, '' );
-}
 
 // Register keyboard shortcuts
 window.addEventListener('keyup', function (e) {
@@ -47,7 +41,7 @@ document.addEventListener('pdf_finished_rendering', function (e) {
 
 function mousemoveHandler ( e ) {
     if ( isMouseDown && e.target !== previousTarget ) {
-        mouseDownCache += ' ' + e.target.innerText;
+        mouseDownCache += '' + e.target.innerText;
     }
     previousTarget = e.target;
 }
@@ -216,78 +210,23 @@ function removeInputsFromExtractorContainer() {
     }
 }
 
-function validate_rechnungsart ( e ) {
-    if ( 'R' === e.target.value.toUpperCase() || /rechnung|rg|invoice|faktur|factur/gi.test( e.target.value ) ) {
-        e.target.value = 'R';
-    } else if ('G' === e.target.value.toUpperCase() || /gutschrift|credit note|credit|crédit/gi.test( e.target.value ) ) {
-        e.target.value = 'G';
-    } else {
-        // default value
-        e.target.value = 'R';
-    }
-}
-
-function validate_waehrung ( e ) {
-    e.target.value = e.target.value.replace(/ /gm, '');
-    if ( /chf|sfr/gi.test( e.target.value ) ) {
-        e.target.value = 'CHF';
-    } else if ( /eur|€/gi.test( e.target.value ) ) {
-        e.target.value = 'EUR';
-    } else if ( /usd|\$/gi.test( e.target.value ) ) {
-        e.target.value = 'USD';
-    } else if ( /gbp|£/gi.test( e.target.value ) ) {
-        e.target.value = 'GBP';
-    } else {
-        // default value
-        //e.target.value = 'CHF';
-    }
-}
-
-function validate_endbetrag ( e ) {
-    var output = e.target.value;
-    // remove whitespace from front and end
-    output = output.trim();
-    outputSplit = output.split('');
-    if ( outputSplit[ outputSplit.length - 2 ] == ' ' ) {
-        outputSplit.splice( outputSplit.length - 2);
-    }
-    output = outputSplit.join('');
-    // replace all non-digits (commas, dots, upticks) with dots
-    output = output.replace(/\D/g, '.');
-    // replace all but the last dot with nothing
-    output = parseFloat( output.replace(/\.(?![^.]+$)|[^0-9.]/g, ''));
-    e.target.value = output.toFixed(2);
-}
-
-function validate_esr_konto ( e ) {
-    var whitelist = '1234567890-';
-    var flags = 'gm';
-    e.target.value = removeChars( whitelist, e.target.value, flags );
-}
-
-function validate_esr_referenz ( e ) {
-    var whitelist = '1234567890';
-    var flags = 'gm';
-    e.target.value = removeChars( whitelist, e.target.value, flags );
-}
-
 function fillExtractorSidebar ( json ) {
     removeInputsFromExtractorContainer();
-    addInputDiv ( 'Rechnungsart', json.rechnungsart[0], validate_rechnungsart);
+    addInputDiv ( 'Rechnungsart', json.rechnungsart[0], validators.validate_rechnungsart);
     addInputDiv ( 'Kreditor', json.kreditor[0] );
     addInputDiv ( 'Name', json.name[0] );
-    addInputDiv ( 'Rg. Nummer', json.rg_nummer[0] );
-    addInputDiv ( 'Rg. Datum', json.rg_datum[0] );
-    addInputDiv ( 'Währung', json.waehrung[0], validate_waehrung );
-    addInputDiv ( 'Endbetrag', json.endbetrag[0], validate_endbetrag );
-    addInputDiv ( 'ESR Konto', json.esr_konto[0], validate_esr_konto );
-    addInputDiv ( 'ESR Referenz', json.esr_referenz[0], validate_esr_referenz );
+    addInputDiv ( 'Rg. Nummer', json.rg_nummer[0], validators.validate_rg_nummer );
+    addInputDiv ( 'Rg. Datum', json.rg_datum[0], validators.validate_rg_datum );
+    addInputDiv ( 'Währung', json.waehrung[0], validators.validate_waehrung );
+    addInputDiv ( 'Endbetrag', json.endbetrag[0], validators.validate_endbetrag );
+    addInputDiv ( 'ESR Konto', json.esr_konto[0], validators.validate_esr_konto );
+    addInputDiv ( 'ESR Referenz', json.esr_referenz[0], validators.validate_esr_referenz );
     addInputDiv ( 'MwSt-Nr.', json.mwst[0] );
     addInputDiv ( 'IBAN', json.iban[0] );
     addInputDiv ( 'Email', json.email[0] );
 }
 
-function addInputDiv ( name, match, onBlurFunction ) {
+function addInputDiv ( name, match, validateFunc ) {
     var div_register = document.createElement('div');
     div_register.setAttribute('class', 'register');
 
@@ -315,7 +254,11 @@ function addInputDiv ( name, match, onBlurFunction ) {
     });
 
     // validate input on blur
-    input.addEventListener( 'blur', onBlurFunction );
+    input.addEventListener( 'blur', function ( e ) {
+        if ( validateFunc ) {
+            e.target.value = validateFunc( e.target.value ).output;
+        }
+    });
 
     // Putting it all together
     label.appendChild(span);

@@ -44,11 +44,10 @@ function Supplier ( attr ) {
     }
 }
 
-
 // Load CSV creditor list
 var lineCounter = 0;
-var csvHeader = [];
-var suppliers = [];
+var csvHeader   = [];
+var suppliers   = [];
 
 const rl = readline.createInterface({
     input: fs.createReadStream('/Users/admin/Desktop/KREDBAN_2019_11_03.csv'),

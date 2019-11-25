@@ -242,6 +242,7 @@ function addInputDiv ( name, match, validateFunc ) {
     var input = document.createElement('input');
     var inputname = 'input_' + name.toLowerCase();
     input.setAttribute( 'Id', inputname );
+    input.setAttribute( 'class', 'valid' );
     input.type = 'text';
     input.readonly = true;
     if ( match ) {
@@ -256,7 +257,15 @@ function addInputDiv ( name, match, validateFunc ) {
     // validate input on blur
     input.addEventListener( 'blur', function ( e ) {
         if ( validateFunc ) {
-            e.target.value = validateFunc( e.target.value ).output;
+            var rv = validateFunc( e.target.value );
+            e.target.value = rv.output;
+            if ( rv.valid === false ) {
+                e.target.classList.remove('valid');
+                e.target.classList.add('invalid');
+            } else {
+                e.target.classList.remove('invalid');
+                e.target.classList.add('valid');
+            }
         }
     });
 

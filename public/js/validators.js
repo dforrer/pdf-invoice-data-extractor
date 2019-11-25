@@ -10,7 +10,6 @@ function validate_rechnungsart ( str ) {
         // default value
         rv.output = 'R';
         rv.default = true;
-        rv.valid = false;
     }
     return rv;
 }
@@ -38,50 +37,60 @@ function validate_rg_datum ( str ) {
             yyyy = '20' + yyyy;
         }
         rv.output = dd + '.' + mm  + '.' + yyyy;
-    } else if ( /20\d\d/gi.test( str ) ) {
-        // string contains date format yyyy
-        // find the year with a regex
-        var regexp = /20\d\d/gi;
-        var matches_array = str.match( regexp );
-        var yyyy = matches_array[ 0 ];
-        // remove the year
-        str = str.replace(/20\d\d/g, '');
-        // find the month in word form
-        var mm = '01';
-        if ( /januar|jan|january|janvier/gi.test( str ) ) {
-            mm = '01';
-        } else if ( /februar|febr?|february|février/gi.test( str ) ) {
-            mm = '02';
-        } else if ( /märz|mär|mar|marz|march|mars/gi.test( str ) ) {
-            mm = '03';
-        } else if ( /april|apr|avril/gi.test( str ) ) {
-            mm = '04';
-        } else if ( /mai|may/gi.test( str ) ) {
-            mm = '05';
-        } else if ( /juni|jun|june|juin/gi.test( str ) ) {
-            mm = '06';
-        } else if ( /juli|jul|july|juillet/gi.test( str ) ) {
-            mm = '07';
-        } else if ( /august|aug|aout|août/gi.test( str ) ) {
-            mm = '08';
-        } else if ( /september|sep|sept|septembre/gi.test( str ) ) {
-            mm = '09';
-        } else if ( /oktober|okt|october|octobre/gi.test( str ) ) {
-            mm = '10';
-        } else if ( /november|nov|novembre/gi.test( str ) ) {
-            mm = '11';
-        } else if ( /dezember|dez|december|décembre|decembre/gi.test( str ) ) {
-            mm = '12';
-        }
-        // remove all non-digits
-        var whitelist = '1234567890';
-        var flags = 'gm';
-        var dd = util.removeChars( whitelist, str, flags );
-        dd = dd.padStart(2, '0');
-        if (parseInt(dd) > 31 ) {
-            dd = '01';
-        }
+    } else if ( str.length === 8 && /\d\d\d\d\d\d\d\d/gi.test( str ) ) {
+        var dd   = str.substring( 0, 2 );
+        var mm   = str.substring( 2, 4 );
+        var yyyy = str.substring( 4 );
         rv.output = dd + '.' + mm  + '.' + yyyy;
+    } else if ( str.length === 6 && /\d\d\d\d\d\d/gi.test( str ) ) {
+        var dd   = str.substring( 0, 2 );
+        var mm   = str.substring( 2, 4 );
+        var yy = str.substring( 4 );
+        rv.output = dd + '.' + mm  + '.' + '20' + yy;
+    // } else if ( /20\d\d/gi.test( str ) ) {
+    //     // string contains date format yyyy
+    //     // find the year with a regex
+    //     var regexp = /20\d\d/gi;
+    //     var matches_array = str.match( regexp );
+    //     var yyyy = matches_array[ 0 ];
+    //     // remove the year
+    //     str = str.replace(/20\d\d/g, '');
+    //     // find the month in word form
+    //     var mm = '01';
+    //     if ( /januar|jan|january|janvier/gi.test( str ) ) {
+    //         mm = '01';
+    //     } else if ( /februar|febr?|february|février/gi.test( str ) ) {
+    //         mm = '02';
+    //     } else if ( /märz|mär|mar|marz|march|mars/gi.test( str ) ) {
+    //         mm = '03';
+    //     } else if ( /april|apr|avril/gi.test( str ) ) {
+    //         mm = '04';
+    //     } else if ( /mai|may/gi.test( str ) ) {
+    //         mm = '05';
+    //     } else if ( /juni|jun|june|juin/gi.test( str ) ) {
+    //         mm = '06';
+    //     } else if ( /juli|jul|july|juillet/gi.test( str ) ) {
+    //         mm = '07';
+    //     } else if ( /august|aug|aout|août/gi.test( str ) ) {
+    //         mm = '08';
+    //     } else if ( /september|sep|sept|septembre/gi.test( str ) ) {
+    //         mm = '09';
+    //     } else if ( /oktober|okt|october|octobre/gi.test( str ) ) {
+    //         mm = '10';
+    //     } else if ( /november|nov|novembre/gi.test( str ) ) {
+    //         mm = '11';
+    //     } else if ( /dezember|dez|december|décembre|decembre/gi.test( str ) ) {
+    //         mm = '12';
+    //     }
+    //     // remove all non-digits
+    //     var whitelist = '1234567890';
+    //     var flags = 'gm';
+    //     var dd = util.removeChars( whitelist, str, flags );
+    //     dd = dd.padStart(2, '0');
+    //     if (parseInt(dd) > 31 ) {
+    //         dd = '01';
+    //     }
+    //     rv.output = dd + '.' + mm  + '.' + yyyy;
     } else {
         rv.output = rv.input;
         rv.default = false;
@@ -103,7 +112,6 @@ function validate_waehrung ( str ) {
         rv.output = 'GBP';
     } else {
         rv.output = 'CHF';
-        rv.valid = false;
         rv.default = true;
     }
     return rv;

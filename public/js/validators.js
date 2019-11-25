@@ -27,8 +27,7 @@ function validate_rg_datum ( str ) {
     var flags = 'gm';
     str = str.trim(); // remove leading and trailing spaces
     var str2 = util.removeChars( whitelist, str, flags );
-    if ( /\d?\d(\.|\/| |-)\d?\d(\.|\/| |-)(\d\d)?\d\d/gi.test( str2 ) ) {
-        // valid date formats
+    if ( /\b\d?\d(\.|\/| |-)\d?\d(\.|\/| |-)(\d\d)?\d\d\b/gi.test( str2 ) ) {
         var dmy = str2.split( /[\.|\/| |-]+/ );
         var dd   = dmy[0].padStart(2, '0');
         var mm   = dmy[1].padStart(2, '0');
@@ -37,12 +36,12 @@ function validate_rg_datum ( str ) {
             yyyy = '20' + yyyy;
         }
         rv.output = dd + '.' + mm  + '.' + yyyy;
-    } else if ( str.length === 8 && /\d\d\d\d\d\d\d\d/gi.test( str ) ) {
+    } else if ( str.length === 8 && /\b\d\d\d\d\d\d\d\d\b/gi.test( str ) ) {
         var dd   = str.substring( 0, 2 );
         var mm   = str.substring( 2, 4 );
         var yyyy = str.substring( 4 );
         rv.output = dd + '.' + mm  + '.' + yyyy;
-    } else if ( str.length === 6 && /\d\d\d\d\d\d/gi.test( str ) ) {
+    } else if ( str.length === 6 && /\b\d\d\d\d\d\d\b/gi.test( str ) ) {
         var dd   = str.substring( 0, 2 );
         var mm   = str.substring( 2, 4 );
         var yy = str.substring( 4 );
@@ -93,7 +92,6 @@ function validate_rg_datum ( str ) {
     //     rv.output = dd + '.' + mm  + '.' + yyyy;
     } else {
         rv.output = rv.input;
-        rv.default = false;
         rv.valid = false;
     }
     return rv;
@@ -111,8 +109,8 @@ function validate_waehrung ( str ) {
     } else if ( /gbp|£/gi.test( str ) ) {
         rv.output = 'GBP';
     } else {
-        rv.output = 'CHF';
-        rv.default = true;
+        rv.output = rv.input;
+        rv.valid = false;
     }
     return rv;
 }
@@ -131,9 +129,8 @@ function validate_endbetrag ( str ) {
     var f = parseFloat( str.replace(/\.(?![^.]+$)|[^0-9.]/g, ''));
     // check if f is NaN and not undefined
     if ( f === NaN || !f ) {
-        rv.output = '0.00';
+        rv.output = rv.input;
         rv.valid = false;
-        rv.default = true;
     } else {
         rv.output = f.toFixed(2);
     }

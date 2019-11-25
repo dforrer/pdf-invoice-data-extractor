@@ -254,8 +254,7 @@ function addInputDiv ( name, match, validateFunc ) {
         focusedInput = e.target;
     });
 
-    // validate input on blur
-    input.addEventListener( 'blur', function ( e ) {
+    var input_validation = function ( e ) {
         if ( validateFunc ) {
             var rv = validateFunc( e.target.value );
             e.target.value = rv.output;
@@ -266,6 +265,16 @@ function addInputDiv ( name, match, validateFunc ) {
                 e.target.classList.remove('invalid');
                 e.target.classList.add('valid');
             }
+        }
+    };
+    // validate input on blur
+    input.addEventListener( 'blur', input_validation );
+
+    // validate input on ENTER keypress
+    input.addEventListener( 'keypress', function ( e ) {
+        var key = e.which || e.keyCode;
+        if ( key === 13 ) { // 13 is enter
+            input_validation( e );
         }
     });
 

@@ -212,8 +212,8 @@ function removeInputsFromExtractorContainer() {
 
 function fillExtractorSidebar ( json ) {
     removeInputsFromExtractorContainer();
-    addInputDiv ( 'Rechnungsart', json.rechnungsart[0], validators.validate_rechnungsart);
-    addInputDiv ( 'Kreditor', json.kreditor[0] );
+    addInputDiv ( 'Rechnungsart (R/G)', json.rechnungsart[0], validators.validate_rechnungsart);
+    addInputDiv ( 'Kreditor', json.kreditor[0], validators.validate_kreditor );
     addInputDiv ( 'Name', json.name[0] );
     addInputDiv ( 'Rg. Nummer', json.rg_nummer[0], validators.validate_rg_nummer );
     addInputDiv ( 'Rg. Datum', json.rg_datum[0], validators.validate_rg_datum );
@@ -247,8 +247,7 @@ function addInputDiv ( name, match, validateFunc ) {
     input.readonly = true;
     if ( match ) {
         input.value = match.value;
-        input.ondblclick = function() { searchPDF(match.match);
-        }
+        input.ondblclick = function() { searchPDF(match.match); }
     }
     input.addEventListener( 'focus', function ( e ) {
         focusedInput = e.target;

@@ -1,5 +1,11 @@
 const util = require('./util.js');
 
+// load suppliers
+const suppliers_loader = require('./suppliers_loader.js');
+suppliers_loader.loadSuppliers( '/Users/admin/Desktop/KREDBAN_2019_11_03.csv', function () {
+    console.log('loadSuppliers finished');
+});
+
 function validate_rechnungsart ( str ) {
     var rv = { input: str, valid: true, default: false };
     if ( 'R' === str.toUpperCase() || /rechnung|rg|invoice|faktur|factur/gi.test( str ) ) {
@@ -10,6 +16,27 @@ function validate_rechnungsart ( str ) {
         // default value
         rv.output = 'R';
         rv.default = true;
+    }
+    return rv;
+}
+
+function validate_kreditor ( str ) {
+    var rv = { input: str, valid: true, default: false };
+    str = str.trim();
+    if ( /^\d+$/gi.test( str ) ) {
+        rv.output = str;
+        var res = suppliers_loader.getSupplierForId( str );
+        if ( res ) {
+            document.getElementById( 'input_name' ).value = res.name1;
+        } else {
+            document.getElementById( 'input_name' ).value = '';
+            rv.valid = false;
+        }
+    } else {
+        // default value
+        rv.output = rv.input;
+        rv.default = false;
+        rv.valid = false;
     }
     return rv;
 }
@@ -155,6 +182,7 @@ function validate_esr_referenz ( str ) {
 
 module.exports = {
     validate_rechnungsart,
+    validate_kreditor,
     validate_rg_nummer,
     validate_rg_datum,
     validate_waehrung,

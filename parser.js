@@ -21,55 +21,9 @@ if (require.main === module) {
     console.log(scriptName + ' required as a module');
 }
 
-// Requirements
-const fs   = require('fs');
-const util = require('util');
-const readline = require('readline');
-
-// Constructors
-function Supplier ( attr ) {
-    this.id = attr['Kreditor'];
-    this.name1 = attr['Name 1'];
-    this.name2 = attr['Name 2'];
-    this.street = attr['Straße'];
-    this.postcode = attr['Postleitz.'];
-    this.town = attr['Ort'];
-    this.country = attr['Land'];
-    this.iban = attr['IBAN'];
-    this.uid = attr['Steuernummer 1'];
-    if ( attr['Zentrale Buchungssperre'] == 'nein' ) {
-        this.posting_block = false;
-    } else {
-        this.posting_block = true;
-    }
-}
-
-// Load CSV creditor list
-var lineCounter = 0;
-var csvHeader   = [];
-var suppliers   = [];
-
-const rl = readline.createInterface({
-    input: fs.createReadStream('/Users/admin/Desktop/KREDBAN_2019_11_03.csv'),
-    crlfDelay: Infinity
-});
-
-rl.on( 'line', (line) => {
-    lineCounter++;
-    var entry = line.split(';');
-    if (lineCounter == 1) {
-        csvHeader = entry;
-    }
-    var s = {};
-    for (var i = 0; i < csvHeader.length; i++) {
-        s[csvHeader[i]] = entry[i];
-    }
-    var supplier = new Supplier(s);
-    // if (lineCounter < 5) {
-    //     console.log(s);
-    //     console.log(supplier);
-    // }
-    suppliers.push(supplier);
+const suppliers_loader = require( './public/js/suppliers_loader.js' );
+suppliers_loader.loadSuppliers( '/Users/admin/Desktop/KREDBAN_2019_11_03.csv', function () {
+    console.log('loadSuppliers finished');
 });
 
 // Main function
@@ -88,7 +42,7 @@ function addSupplierToExtractedData ( extracted_data ) {
     // find supplier for IBAN
     for ( var i = 0 ; i < extracted_data.iban.length ; i++ ) {
         var ibanValue = extracted_data.iban[i].value;
-        var res = getSupplierForIban( ibanValue );
+        var res = suppliers_loader.getSupplierForIban( ibanValue );
         if ( res.posting_block == true ) {
             continue;
         }
@@ -111,7 +65,7 @@ function addSupplierToExtractedData ( extracted_data ) {
     // find supplier for UID
     for ( var i = 0 ; i < extracted_data.mwst.length ; i++ ) {
         var mwstValue = extracted_data.mwst[i].value;
-        var res = getSupplierForUid( mwstValue );
+        var res = suppliers_loader.getSupplierForUid( mwstValue );
         if ( res.posting_block == true ) {
             continue;
         }
@@ -142,24 +96,6 @@ function addSupplierToExtractedData ( extracted_data ) {
         position: 0
     }];
     return extracted_data;
-}
-
-function getSupplierForIban ( iban ) {
-    for ( var i = 0 ; i < suppliers.length ; i++ ) {
-        if ( suppliers[i].iban == iban ) {
-            return suppliers[i];
-        }
-    }
-    return 0;
-}
-
-function getSupplierForUid ( uid ) {
-    for ( var i = 0 ; i < suppliers.length ; i++ ) {
-        if ( suppliers[i].uid == uid ) {
-            return suppliers[i];
-        }
-    }
-    return 0;
 }
 
 function keepTopFive (data) {

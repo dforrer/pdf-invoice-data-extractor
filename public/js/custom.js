@@ -212,21 +212,21 @@ function removeInputsFromExtractorContainer() {
 
 function fillExtractorSidebar ( json ) {
     removeInputsFromExtractorContainer();
-    addInputDiv ( 'Rechnungsart (R/G)', json.rechnungsart[0], validators.validate_rechnungsart);
-    addInputDiv ( 'Kreditor', json.kreditor[0], validators.validate_kreditor );
-    addInputDiv ( 'Name', json.name[0] );
-    addInputDiv ( 'Rg. Nummer', json.rg_nummer[0], validators.validate_rg_nummer );
-    addInputDiv ( 'Rg. Datum', json.rg_datum[0], validators.validate_rg_datum );
-    addInputDiv ( 'Währung', json.waehrung[0], validators.validate_waehrung );
-    addInputDiv ( 'Endbetrag', json.endbetrag[0], validators.validate_endbetrag );
-    addInputDiv ( 'ESR Konto', json.esr_konto[0], validators.validate_esr_konto );
-    addInputDiv ( 'ESR Referenz', json.esr_referenz[0], validators.validate_esr_referenz );
-    addInputDiv ( 'MwSt-Nr.', json.mwst[0] );
-    addInputDiv ( 'IBAN', json.iban[0] );
-    addInputDiv ( 'Email', json.email[0] );
+    addInputDiv ( 'Rechnungsart (R/G)', json, 'rechnungsart', validators.validate_rechnungsart);
+    addInputDiv ( 'Kreditor', json, 'kreditor', validators.validate_kreditor );
+    addInputDiv ( 'Name', json, 'name' );
+    addInputDiv ( 'Rg. Nummer', json, 'rg_nummer', validators.validate_rg_nummer );
+    addInputDiv ( 'Rg. Datum', json, 'rg_datum', validators.validate_rg_datum );
+    addInputDiv ( 'Währung', json, 'waehrung', validators.validate_waehrung );
+    addInputDiv ( 'Endbetrag', json, 'endbetrag', validators.validate_endbetrag );
+    addInputDiv ( 'ESR Konto', json, 'esr_konto', validators.validate_esr_konto );
+    addInputDiv ( 'ESR Referenz', json, 'esr_referenz', validators.validate_esr_referenz );
+    addInputDiv ( 'MwSt-Nr.', json, 'mwst' );
+    addInputDiv ( 'IBAN', json, 'iban' );
+    addInputDiv ( 'Email', json, 'email' );
 }
 
-function addInputDiv ( name, match, validateFunc ) {
+function addInputDiv ( name, json, key, validateFunc ) {
     var div_register = document.createElement('div');
     div_register.setAttribute('class', 'register');
 
@@ -240,11 +240,13 @@ function addInputDiv ( name, match, validateFunc ) {
     span.innerHTML = name;
 
     var input = document.createElement('input');
-    var inputname = 'input_' + name.toLowerCase();
+    var inputname = 'input_' + key;
     input.setAttribute( 'Id', inputname );
+    input.setAttribute( 'name', key );
     input.setAttribute( 'class', 'valid' );
     input.type = 'text';
     input.readonly = true;
+    var match = json[key][0];
     if ( match ) {
         input.value = match.value;
         input.ondblclick = function() { searchPDF(match.match); }
@@ -271,8 +273,8 @@ function addInputDiv ( name, match, validateFunc ) {
 
     // validate input on ENTER keypress
     input.addEventListener( 'keypress', function ( e ) {
-        var key = e.which || e.keyCode;
-        if ( key === 13 ) { // 13 is enter
+        var keypress = e.which || e.keyCode;
+        if ( keypress === 13 ) { // 13 is enter
             input_validation( e );
         }
     });

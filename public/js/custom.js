@@ -166,11 +166,11 @@ function deletePDFFromQueue() {
 }
 
 function update_button_load_next_pdf () {
-    var el = document.getElementById('load_next_pdf');
+    var el = document.getElementById('current_pdf');
     if (pdf_queue.length > 0) {
-        el.innerHTML = "Next (" + (pdf_queue_index + 1) + "/" +  pdf_queue.length + ")";
+        el.innerHTML = (pdf_queue_index + 1) + "/" +  pdf_queue.length ;
     } else {
-        el.innerHTML = "Next (0/0)";
+        el.innerHTML = "0/0";
     }
 }
 

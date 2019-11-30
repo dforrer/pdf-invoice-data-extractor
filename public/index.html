@@ -388,17 +388,21 @@ See https://github.com/adobe-type-tools/cmap-resources
     <div id="extractorContainer">
       <div id="extracted_data">
       </div>
-      <a id="delete_pdf" class="button6 button7 button8" href="#" onclick="deletePDFFromQueue();">
-              Delete
-      </a>
-
-      <a id="load_next_pdf" class="button6 button7" href="#" onclick="nextPDF(1);">
-              Next (0/0)
-      </a>
       <a class="button6" href="#" onclick="sendToSAP();">
-              SAP IC
+          Export
       </a>
-
+      <a id="load_prev_pdf" class="button6 button9" href="#" onclick="nextPDF(-1);">
+          <
+      </a>
+      <a id="current_pdf" class="button6 button10" href="#" onclick="nextPDF(0);">
+          0/0
+      </a>
+      <a id="load_next_pdf" class="button6 button7" href="#" onclick="nextPDF(1);">
+          >
+      </a>
+      <a id="delete_pdf" class="button6 button7 button8" href="#" onclick="deletePDFFromQueue();">
+          Delete
+      </a>    
       <div id="pdf_drop_area">
         PDFs hier hinziehen
       </div>

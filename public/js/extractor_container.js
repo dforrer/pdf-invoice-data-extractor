@@ -2,13 +2,15 @@
 const { ipcRenderer } = require('electron');
 const validators = require('./js/validators.js');
 
-// Global variables
+// Model variables
+var pdf_queue       = [];
+var pdf_queue_index = 0;
+
+// GUI variables
 var userSearch      = true;
 var textDivs_ref    = undefined;
 var begin_divIdx    = undefined;
 var end_divIdx      = undefined;
-var pdf_queue       = [];
-var pdf_queue_index = 0;
 var viewer          = null; // div 'viewer' reference from PDFViewerApplication
 var viewerSpans     = []; // Array of all the span-elements inside the viewer div
 var isMouseDown     = false;
@@ -16,7 +18,7 @@ var mouseDownCache  = ''; // string to store the content of the current selectio
 var previousTarget  = null;
 var focusedInput    = null;
 
-// Object declarations
+// Model object declarations
 function PDF ( filepath, extracted_data ) {
     this.filepath = filepath;
     this.extracted_data = extracted_data;

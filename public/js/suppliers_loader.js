@@ -43,10 +43,6 @@ function loadSuppliers ( csvPath, cb ) {
             s[csvHeader[i]] = entry[i];
         }
         var supplier = new Supplier(s);
-        // if (lineCounter < 5) {
-        //     console.log(s);
-        //     console.log(supplier);
-        // }
         suppliers.push(supplier);
     });
 

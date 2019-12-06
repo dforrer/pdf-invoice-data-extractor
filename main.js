@@ -77,31 +77,43 @@ Queue.prototype.size = function() {
 // Requirements
 const PDFExtract = require('pdf.js-extract').PDFExtract;
 const pdfExtract = new PDFExtract();
-const options = {};
 const parser = require('./parser.js');
 const exec = require("child_process").exec;
 const fs = require('fs');
+const js2xmlparser = require("js2xmlparser");
 
 // Constants
 const OCRMYPDF = false;
 const DEBUG = false;
-const q = new Queue();
-var running_jobs_count = 0;
+const extractQueue = new Queue();
+var running_extract_jobs_count = 0;
 
-// In main process.
+// Register ipc event handlers
 ipcMain.on( 'extract-data-from-pdf', (event, arg) => {
     //console.log( event );
-    q.add( {"event":event, "pdf":arg } );
-    schedule_job();
+    extractQueue.add( { "event":event, "pdf":arg } );
+    schedule_extract_job();
 });
 
-function schedule_job() {
-    if ( q.size() == 0 || running_jobs_count > 1 ) {
+ipcMain.on( 'export-pdf-data', (event, arg) => {
+    var formattedData = undefined;
+    if ( arg.format === 'json' ) {
+        formattedData = JSON.stringify( arg.validated_data );
+    } else if ( arg.format === 'xml' ) {
+        formattedData = js2xmlparser.parse( "invoice", arg.validated_data );
+    }
+    fs.writeFile( arg.filepath + '.' + arg.format, formattedData, 'utf8', (err) => {
+        if (err) throw err;
+    });
+});
+
+function schedule_extract_job() {
+    if ( extractQueue.size() == 0 || running_extract_jobs_count > 1 ) {
         return;
     }
-    running_jobs_count += 1;
-    var nextEl = q.last();
-    q.remove();
+    running_extract_jobs_count += 1;
+    var nextEl = extractQueue.last();
+    extractQueue.remove();
     if ( OCRMYPDF ) {
         const cmd = 'ocrmypdf -l deu --force-ocr "' + nextEl.pdf.filepath + '" "' + nextEl.pdf.filepath + '"';
         exec( cmd, (error, stdout, stderr) => {
@@ -117,6 +129,7 @@ function schedule_job() {
 }
 
 function extract_pdf ( nextEl ) {
+    const options = {};
     pdfExtract.extract( nextEl.pdf.filepath, options, (err, data) => {
         if (err) return console.log(err);
         if ( DEBUG ) {
@@ -129,8 +142,8 @@ function extract_pdf ( nextEl ) {
             function(pdf_text, extracted_data) {
                 nextEl.pdf.extracted_data = extracted_data;
                 nextEl.event.reply('data-extraction-done', nextEl.pdf);
-                running_jobs_count -= 1;
-                schedule_job();
+                running_extract_jobs_count -= 1;
+                schedule_extract_job();
                 if ( DEBUG ) {
                     // write file to disk
                     fs.writeFile( nextEl.pdf.filepath + '.txt', pdf_text, 'utf8', (err) => {

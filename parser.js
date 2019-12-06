@@ -216,6 +216,20 @@ function cleanup_extracted_data ( d ) {
     }
     d.mwst = mwst_rv;
 
+    // telefon cleanup ---------------
+    var telefon_rv = [];
+    for (const p of Object.entries(d.telefon)) {
+        var key   = p[0];
+        var value = p[1];
+        var r = {};
+        r.match = key;
+        r.value = value.g1.replace(/\+/gi,'00')
+                          .replace(/\D/gi,'');
+        r.position = value.i;
+        telefon_rv.push( r );
+    }
+    d.telefon = telefon_rv;
+
     // iban cleanup ---------------
     var iban_rv = [];
     for (const p of Object.entries(d.iban)) {
@@ -413,6 +427,7 @@ function extractRegex( str ) {
     var pattern_datum_mmddyy = /TODO/gim;
     var pattern_datum_yymmdd = /TODO/gim;
     var pattern_referenz = /TODO/gim;
+    var pattern_telefon = /((tel.{0,12})?(\+\d{2}) (\(?\d{1,2}\))?\d{2,3} \d{3} \d{2} \d{2})|((tel.{0,9})?\d{2,3} ?\d{3} \d{2} \d{2})/gim;
 
     var pattern_email = /\b((?:(?:[^<>()\[\]\\.,;:\s@"]+(?:\.[^<>()\[\]\\.,;:\s@"]+)*)|(?:".+"))@(?:(?:\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(?:(?:[a-zA-Z\-0-9]+(?:\.))+[a-zA-Z]{2,})))\b/gim;
     var pattern_endbetrag = /(?:rechnungstotal|gesamtsumme|summe|amount|gesamtbetrag|total|invoicetotal|betrag|chf|sfr|fr\.|eur|usd|gbp|\$|€|brutto)(?:\s|\D){1,20}((?:\d{1,3}(?:\'|\’|\.|\,|\s)?)?(?:\d{1,3}(?:(?:\'|\.|\,|\ )?(?:\d{2}|-)?)))(?!%|\d)/gim;
@@ -489,6 +504,7 @@ function extractRegex( str ) {
          //rg_datum: pattern_datum_ddmmyy,
          rg_datum_dirty: pattern_datum_dirty_ddmmyy,
          email: pattern_email,
+         telefon: pattern_telefon,
          endbetrag: pattern_endbetrag,
          rg_nummer: pattern_rechnungsnummer,
          esr_betrag: pattern_esr_betrag,

@@ -10,4 +10,27 @@ Regular expressions are used to extract the field values from a text only versio
 
 ### ML data extraction
 
+### PDF extraction pipeline
+
+```
+            scan              OCR            regex
+1 document ------> N images -------> 1 text -------> N key-value pairs
+                                                      (extracted_data)
+
+```
+
+### Validation pipeline
+
+```
+                   user validation
+N key-value pairs ----------------> N key-value pairs
+ (extracted_data)                    (validated_data)
+
+```
+
+### Learning pipeline
+
+
+
+
 ## Installation and Usage

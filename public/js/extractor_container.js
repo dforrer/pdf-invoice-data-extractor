@@ -56,7 +56,6 @@ function dblclickHandler (e) {
     if ( mouseDownCache.length > 0 ) {
         focusedInput.value = mouseDownCache;
         focusedInput.focus();
-        console.log( e.target );
     }
 }
 
@@ -176,10 +175,16 @@ function update_button_load_next_pdf () {
     }
 }
 
-function sendToSAP () {
-    console.log('sendToSAP called');
-    // TODO implement sendToSAP
-    deletePDFFromQueue();
+function exportPDFData() {
+    console.log('exportPDFData called');
+    if ( pdf_queue.length > 0 ) {
+        var pdf = pdf_queue[ pdf_queue_index ];
+        pdf.validated_data = collectExtractorContainerData();
+        pdf.format = 'xml';
+        ipcRenderer.send( 'export-pdf-data', pdf );
+        // TODO implement exportPDFData
+        deletePDFFromQueue();
+    }
 }
 
 function loadJSONData() {
@@ -187,7 +192,6 @@ function loadJSONData() {
     var path = url.searchParams.get("file");
     path = path.slice(0, -4);
     path = path + '.txt';
-    console.log( path );
     // load JSON for PDF file
     fetch( path )
       .then(response => {
@@ -212,6 +216,28 @@ function removeInputsFromExtractorContainer() {
     }
 }
 
+function getInputValue( inputname ) {
+    return document.getElementById( 'input_' +inputname ).value;
+}
+
+function collectExtractorContainerData() {
+    var validated_data = {};
+    validated_data[ 'rechnungsart' ] = getInputValue( 'rechnungsart' );
+    validated_data[ 'kreditor' ] = getInputValue( 'kreditor' );
+    validated_data[ 'name' ] = getInputValue( 'name' );
+    validated_data[ 'rg_nummer' ] = getInputValue( 'rg_nummer' );
+    validated_data[ 'rg_datum' ] = getInputValue( 'rg_datum' );
+    validated_data[ 'waehrung' ] = getInputValue( 'waehrung' );
+    validated_data[ 'endbetrag' ] = getInputValue( 'endbetrag' );
+    validated_data[ 'esr_konto' ] = getInputValue( 'esr_konto' );
+    validated_data[ 'esr_referenz' ] = getInputValue( 'esr_referenz' );
+    validated_data[ 'mwst' ] = getInputValue( 'mwst' );
+    validated_data[ 'iban' ] = getInputValue( 'iban' );
+    validated_data[ 'email' ] = getInputValue( 'email' );
+    validated_data[ 'telefon' ] = getInputValue( 'telefon' );
+    return validated_data;
+}
+
 function fillExtractorSidebar ( json ) {
     removeInputsFromExtractorContainer();
     addInputDiv ( 'Rechnungsart (R/G)', json, 'rechnungsart', validators.validate_rechnungsart);
@@ -226,6 +252,7 @@ function fillExtractorSidebar ( json ) {
     addInputDiv ( 'MwSt-Nr.', json, 'mwst' );
     addInputDiv ( 'IBAN', json, 'iban' );
     addInputDiv ( 'Email', json, 'email' );
+    addInputDiv ( 'Telefon', json, 'telefon' );
 }
 
 function addInputDiv ( name, json, key, validateFunc ) {

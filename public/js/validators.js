@@ -1,8 +1,10 @@
-const util = require('./util.js');
+// Requirements
+const settings         = require('./../../settings.json');
+const util             = require('./util.js');
+const suppliers_loader = require('./suppliers_loader.js');
 
 // load suppliers
-const suppliers_loader = require('./suppliers_loader.js');
-suppliers_loader.loadSuppliers( '/Users/admin/Desktop/KREDBAN_2019_11_03.csv', function () {
+suppliers_loader.loadSuppliers( settings[ 'suppliers_csv_path' ], function () {
     console.log('loadSuppliers finished');
 });
 
@@ -44,7 +46,7 @@ function validate_kreditor ( str ) {
 function validate_rg_nummer ( str ) {
     var rv = { input: str, valid: true, default: false };
     // replace all whitespace characters
-    rv.output = str.replace(/\s/g, '');
+    rv.output = str.replace(/\s+/g, ' ').trim();
     return rv;
 }
 

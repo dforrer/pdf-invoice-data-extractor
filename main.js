@@ -75,17 +75,20 @@ Queue.prototype.size = function() {
 }
 
 // Requirements
-const PDFExtract = require('pdf.js-extract').PDFExtract;
-const pdfExtract = new PDFExtract();
-const parser = require('./parser.js');
-const exec = require("child_process").exec;
-const fs = require('fs');
-const js2xmlparser = require("js2xmlparser");
+const PDFExtract    = require('pdf.js-extract').PDFExtract;
+const pdfExtract    = new PDFExtract();
+const parser        = require('./parser.js');
+const exec          = require("child_process").exec;
+const fs            = require('fs');
+const js2xmlparser  = require("js2xmlparser");
+const settings      = require('./settings.json')
 
 // Constants
-const OCRMYPDF = false;
-const DEBUG = false;
-const extractQueue = new Queue();
+const OCRMYPDF      = settings[ 'ocrmypdf' ];
+const DEBUG         = settings[ 'debug' ];
+const EXPORT_FORMAT = settings[ 'export_format' ];
+
+const extractQueue  = new Queue();
 var running_extract_jobs_count = 0;
 
 // Register ipc event handlers
@@ -97,12 +100,13 @@ ipcMain.on( 'extract-data-from-pdf', (event, arg) => {
 
 ipcMain.on( 'export-pdf-data', (event, arg) => {
     var formattedData = undefined;
-    if ( arg.format === 'json' ) {
+    if ( EXPORT_FORMAT === 'json' ) {
         formattedData = JSON.stringify( arg.validated_data );
-    } else if ( arg.format === 'xml' ) {
+    } else {
+        // default to XML format
         formattedData = js2xmlparser.parse( "invoice", arg.validated_data );
     }
-    fs.writeFile( arg.filepath + '.' + arg.format, formattedData, 'utf8', (err) => {
+    fs.writeFile( arg.filepath + '.' + EXPORT_FORMAT, formattedData, 'utf8', (err) => {
         if (err) throw err;
     });
 });
@@ -134,7 +138,7 @@ function extract_pdf ( nextEl ) {
         if (err) return console.log(err);
         if ( DEBUG ) {
             // write file to disk
-            fs.writeFile( nextEl.pdf.filepath + '.json', JSON.stringify(data), 'utf8', (err) => {
+            fs.writeFile( nextEl.pdf.filepath + '_DEBUG.json', JSON.stringify(data), 'utf8', (err) => {
                 if (err) throw err;
             });
         }
@@ -146,7 +150,7 @@ function extract_pdf ( nextEl ) {
                 schedule_extract_job();
                 if ( DEBUG ) {
                     // write file to disk
-                    fs.writeFile( nextEl.pdf.filepath + '.txt', pdf_text, 'utf8', (err) => {
+                    fs.writeFile( nextEl.pdf.filepath + '_DEBUG.txt', pdf_text, 'utf8', (err) => {
                         if (err) throw err;
                     });
                 }

@@ -21,8 +21,10 @@ if (require.main === module) {
     console.log(scriptName + ' required as a module');
 }
 
+// Requirements
+const settings = require('./settings.json')
 const suppliers_loader = require( './public/js/suppliers_loader.js' );
-suppliers_loader.loadSuppliers( '/Users/admin/Desktop/KREDBAN_2019_11_03.csv', function () {
+suppliers_loader.loadSuppliers( settings[ 'suppliers_csv_path' ], function () {
     console.log('loadSuppliers finished');
 });
 

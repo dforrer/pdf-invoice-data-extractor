@@ -1,6 +1,7 @@
 // Requirements
-const { ipcRenderer } = require('electron');
-const validators = require('./js/validators.js');
+const {ipcRenderer} = require('electron');
+const validators    = require('./js/validators.js');
+const settings      = require('./../settings.json');
 
 // Model variables
 var pdf_queue       = [];
@@ -121,6 +122,10 @@ function setupIPC() {
     });
 }
 
+function setFocusToInput( inputname ){
+    document.getElementById( inputname ).focus();
+}
+
 function registerDropAreaEvent() {
     document.getElementById('pdf_drop_area').addEventListener('drop', (e) => {
         e.preventDefault();
@@ -153,6 +158,7 @@ function nextPDF( plusMinusOne ) {
         PDFViewerApplication.open( next_pdf.filepath );
         fillExtractorSidebar( next_pdf.extracted_data );
         registerMouseEvents();
+        setFocusToInput( 'input_rechnungsart' );
     }
     update_button_load_next_pdf();
 }
@@ -180,7 +186,6 @@ function exportPDFData() {
     if ( pdf_queue.length > 0 ) {
         var pdf = pdf_queue[ pdf_queue_index ];
         pdf.validated_data = collectExtractorContainerData();
-        pdf.format = 'xml';
         ipcRenderer.send( 'export-pdf-data', pdf );
         // TODO implement exportPDFData
         deletePDFFromQueue();

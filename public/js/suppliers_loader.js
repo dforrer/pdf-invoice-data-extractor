@@ -1,9 +1,16 @@
 // Requirements
-const fs   = require('fs');
+const fs       = require('fs');
 const readline = require('readline');
+
+// Global variables
 const suppliers = [];
 
-// Constructors
+/**
+ * Constructs a Supplier-object
+ * @constructor
+ * @param {object} attr - object containing the attributes of a single supplier
+ */
+
 function Supplier ( attr ) {
     this.id = attr['Kreditor'];
     this.name1 = attr['Name 1'];
@@ -21,7 +28,12 @@ function Supplier ( attr ) {
     }
 }
 
-// Main function
+/**
+ * Loads the list of suppliers from a CSV file and adds them to the suppliers array
+ * @param {string} csvPath - path to a csv file semicolon delimited
+ * @param {callback} cb
+ */
+
 function loadSuppliers ( csvPath, cb ) {
     // Load CSV creditor list
     var lineCounter = 0;
@@ -51,6 +63,12 @@ function loadSuppliers ( csvPath, cb ) {
     });
 }
 
+/**
+ * Get function to retrieve single supplier from suppliers array based on IBAN
+ * @param {string} iban
+ * @returns {Supplier}
+ */
+
 function getSupplierForIban ( iban ) {
     for ( var i = 0 ; i < suppliers.length ; i++ ) {
         if ( suppliers[i].iban == iban ) {
@@ -60,6 +78,12 @@ function getSupplierForIban ( iban ) {
     return 0;
 }
 
+/**
+ * Get function to retrieve single supplier from suppliers array based on UID
+ * @param {string} uid
+ * @returns {Supplier}
+ */
+
 function getSupplierForUid ( uid ) {
     for ( var i = 0 ; i < suppliers.length ; i++ ) {
         if ( suppliers[i].uid == uid ) {
@@ -68,6 +92,12 @@ function getSupplierForUid ( uid ) {
     }
     return 0;
 }
+
+/**
+ * Get function to retrieve single supplier from suppliers array based on creditor ID
+ * @param {string} id
+ * @returns {Supplier}
+ */
 
 function getSupplierForId ( id ) {
     for ( var i = 0 ; i < suppliers.length ; i++ ) {

@@ -33,10 +33,18 @@ window.addEventListener('keyup', function (e) {
     }
 });
 
-/* Here we listen for the custom event from viewer.js */
-document.addEventListener('pdf_finished_rendering', function (e) {
-    registerSpanOnMouseOver();
-}, true);
+function waitForElement(){
+    try {
+        //variable exists, do what you want
+        PDFViewerApplication.pdfViewer.eventBus.on( 'textlayerrendered', function (e) {
+            registerSpanOnMouseOver();
+        });
+    } catch (e) {
+        setTimeout(waitForElement, 250);
+    }
+}
+
+waitForElement();
 
 function mousemoveHandler ( e ) {
     if ( isMouseDown && e.target !== previousTarget ) {

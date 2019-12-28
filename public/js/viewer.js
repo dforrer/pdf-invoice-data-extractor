@@ -12525,15 +12525,6 @@ function () {
         offset: undefined
       };
 
-      /* BEGIN added code by dforrer */
-      if ( !userSearch ) {
-          // just highlight the first match
-          highlightMatch1(this.matches, textDivs);
-          // clear the matches array to prevent unhighlighting when closing the findbar
-          this.matches = [];
-      }
-      /* END added code by dforrer */
-
       function beginText(begin, className) {
         var divIdx = begin.divIdx;
         textDivs[divIdx].textContent = '';

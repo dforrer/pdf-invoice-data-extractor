@@ -8,10 +8,6 @@ var pdf_queue       = [];
 var pdf_queue_index = 0;
 
 // GUI variables
-var userSearch      = true;
-var textDivs_ref    = undefined;
-var begin_divIdx    = undefined;
-var end_divIdx      = undefined;
 var viewer          = null; // div 'viewer' reference from PDFViewerApplication
 var viewerSpans     = []; // Array of all the span-elements inside the viewer div
 var isMouseDown     = false;
@@ -323,60 +319,15 @@ function addInputDiv ( name, json, key, validateFunc ) {
 }
 
 /*
- * Triggers the "normal" search function from pdf.js by creating an event
- * adapted from https://stackoverflow.com/questions/34717771/search-using-code-on-embedded-pdfjs
+ * Triggers the "findagain" search event from viewer.js
  */
-function searchPDF(td_text)
-{
-    //PDFViewerApplication.pdfViewer.scrollPageIntoView({pageNumber:1, destArray:0, allowNegativeOffset: false})
-    unhighlightMatch1();    // before highlighting the next text, unhighlight the previous find
-    userSearch = false;
-    PDFViewerApplication.findBar.open();
-    PDFViewerApplication.findBar.findField.value = td_text;
-
-    var event = document.createEvent('CustomEvent');
-    event.initCustomEvent('findagain', true, true, {
-        query: td_text,
-        caseSensitive: false,
-        highlightAll: true,
-        findPrevious: undefined
+function searchPDF ( searchText ) {
+    PDFViewerApplication.findController.executeCommand('findagain', {
+      query: searchText,
+      phraseSearch: true,
+      caseSensitive: false,
+      entireWord: false,
+      highlightAll: false,
+      findPrevious: undefined
     });
-
-    PDFViewerApplication.findBar.dispatchEvent('');
-    document.getElementById("findbar").style.display = "none"; // hide the findbar temporarily
-    return event;
-}
-
-/*
- * Called by TextLayerBuilder function _renderMatches
- */
-function highlightMatch1( matches, textDivs ) {
-    begin_divIdx = matches[0].begin.divIdx;
-    end_divIdx   = matches[0].end.divIdx;
-    textDivs_ref = textDivs; // store a reference to textDivs to later unhighlight from begin_divIdx to end_divIdx
-    PDFViewerApplication.findBar.close();
-    document.getElementById("findbar").style.display = ""; // show the findbar again
-    userSearch = true; // re-enable normal user searches
-}
-
-/*
- * Function to clear the highlighted div's childnodes
- */
-function unhighlightMatch1() {
-    document.getElementById("findbar").style.display = ""; // show the findbar again
-    userSearch = true; // re-enable normal user searches
-    if ( begin_divIdx !== undefined ) {
-        // unhighlight all divs from begin_divIdx to end_divIdx
-        for (var n = begin_divIdx, end = end_divIdx; n <= end; n++) {
-          var div = textDivs_ref[n];
-          div.className = '';
-          if ( n == begin_divIdx || n == end ) {
-              // also remove the highlight class from begin and end-divs
-              var c = div.childNodes;
-              for (var i = 0 ; i < c.length ; i++ ) {
-                c[i].className = '';
-              }
-          }
-        }
-    }
 }

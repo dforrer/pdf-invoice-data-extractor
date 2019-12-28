@@ -114,7 +114,7 @@ function setupIPC() {
         var newPDF = new PDF( arg.filepath, arg.extracted_data );
         delete newPDF.extracted_data.seiten;
         pdf_queue.push( newPDF );
-        update_button_load_next_pdf();
+        updateButtonLoadNextPDF();
         if ( PDFViewerApplication.pdfDocument == null ) {
             pdf_queue_index = -1;
             nextPDF( 1 );
@@ -160,7 +160,7 @@ function nextPDF( plusMinusOne ) {
         registerMouseEvents();
         setFocusToInput( 'input_rechnungsart' );
     }
-    update_button_load_next_pdf();
+    updateButtonLoadNextPDF();
 }
 
 function deletePDFFromQueue() {
@@ -172,7 +172,7 @@ function deletePDFFromQueue() {
     nextPDF( -1 );
 }
 
-function update_button_load_next_pdf () {
+function updateButtonLoadNextPDF () {
     var el = document.getElementById('current_pdf');
     if (pdf_queue.length > 0) {
         el.innerHTML = (pdf_queue_index + 1) + "/" +  pdf_queue.length ;

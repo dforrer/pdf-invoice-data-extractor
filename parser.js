@@ -23,7 +23,7 @@ if (require.main === module) {
 
 // Requirements
 const settings = require('./settings.json')
-const suppliers_loader = require( './public/js/suppliers_loader.js' );
+const suppliers_loader = require( './public/extractor/suppliers_loader.js' );
 suppliers_loader.loadSuppliers( settings[ 'suppliers_csv_path' ], function () {
     console.log('loadSuppliers finished');
 });

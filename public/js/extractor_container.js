@@ -35,10 +35,8 @@ window.addEventListener('keyup', function (e) {
 
 function waitForElement(){
     try {
-        //variable exists, do what you want
-        PDFViewerApplication.pdfViewer.eventBus.on( 'textlayerrendered', function (e) {
-            registerSpanOnMouseOver();
-        });
+        // try registering a callback on the PDFViewerApplication eventbus
+        PDFViewerApplication.pdfViewer.eventBus.on( 'textlayerrendered', registerSpanOnMouseOver );
     } catch (e) {
         setTimeout(waitForElement, 250);
     }

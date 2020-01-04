@@ -1,26 +1,3 @@
-// get filename of current script
-var path = require('path');
-var scriptName = path.basename(__filename);
-
-// handle script differently based on how it is being called
-if (require.main === module) {
-    console.log(scriptName + ' called directly');
-    // parse cmd-line arguments
-    var inputfile = process.argv[2];
-    var outputfile = process.argv[3];
-
-    if ( !inputfile || !outputfile ) {
-        console.log("Please define an input- and output-file!");
-        process.exit(1);
-    }
-
-    parseJsonAndExport( inputfile, outputfile, function (rv) {
-        console.log(rv);
-    });
-} else {
-    console.log(scriptName + ' required as a module');
-}
-
 // Requirements
 const settings = require('./settings.json')
 const suppliers_loader = require( './public/extractor/suppliers_loader.js' );

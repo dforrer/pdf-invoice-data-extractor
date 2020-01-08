@@ -8,7 +8,7 @@ suppliers_loader.loadSuppliers( settings[ 'suppliers_csv_path' ], function () {
     console.log('loadSuppliers finished');
 });
 
-function validate_rechnungsart ( str ) {
+function validate_invoice_type ( str ) {
     var rv = { input: str, valid: true, default: false };
     if ( 'R' === str.toUpperCase() || /rechnung|rg|invoice|faktur|factur/gi.test( str ) ) {
         rv.output = 'R';
@@ -50,7 +50,7 @@ function validate_rg_nummer ( str ) {
     return rv;
 }
 
-function validate_rg_datum ( str ) {
+function validate_invoice_date ( str ) {
     var rv = { input: str, valid: true, default: false };
     var whitelist = '1234567890\./\\- ';
     var flags = 'gm';
@@ -183,10 +183,10 @@ function validate_esr_referenz ( str ) {
 }
 
 module.exports = {
-    validate_rechnungsart,
+    validate_invoice_type,
     validate_kreditor,
     validate_rg_nummer,
-    validate_rg_datum,
+    validate_invoice_date,
     validate_waehrung,
     validate_endbetrag,
     validate_esr_konto,

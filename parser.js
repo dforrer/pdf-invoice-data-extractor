@@ -5,14 +5,24 @@ suppliers_loader.loadSuppliers( settings[ 'suppliers_csv_path' ], function () {
     console.log('loadSuppliers finished');
 });
 
+var ExtractorInvoiceType = require( './public/extractor/ExtractorInvoiceType.js' );
+var ExtractorInvoiceDate = require( './public/extractor/ExtractorInvoiceDate.js' );
+
+//import {ExtractorInvoiceDate} from 'ExtractorInvoiceDate';
+//import {ExtractorInvoiceType} from 'ExtractorInvoiceType';
+
 // Main function
 function parseJsonAndExport ( data, cb ) {
     var pdf_text = parseJSON( data );
-    var extracted_data = extractRegex( pdf_text );
-
-    extracted_data = cleanup_extracted_data(extracted_data);
-    extracted_data = keepTopFive(extracted_data);
-    extracted_data = addSupplierToExtractedData(extracted_data);
+    var extracted_data = {};
+    var invoice_type = new ExtractorInvoiceType( pdf_text, extracted_data );
+    extracted_data.invoice_type = invoice_type.extract();
+    var invoice_date = new ExtractorInvoiceDate( pdf_text, extracted_data );
+    extracted_data.invoice_date = invoice_date.extract();
+    // console.log(output);
+    // extracted_data = cleanup_extracted_data(extracted_data);
+    // extracted_data = keepTopFive(extracted_data);
+    // extracted_data = addSupplierToExtractedData(extracted_data);
 
     cb( pdf_text, extracted_data );
 }

@@ -160,7 +160,7 @@ function nextPDF( plusMinusOne ) {
         PDFViewerApplication.open( next_pdf.filepath );
         fillExtractorSidebar( next_pdf.extracted_data );
         registerMouseEvents();
-        setFocusToInput( 'input_rechnungsart' );
+        setFocusToInput( 'input_invoice_type' );
     }
     updateButtonLoadNextPDF();
 }
@@ -229,11 +229,11 @@ function getInputValue( inputname ) {
 
 function collectExtractorContainerData() {
     var validated_data = {};
-    validated_data[ 'rechnungsart' ] = getInputValue( 'rechnungsart' );
+    validated_data[ 'invoice_type' ] = getInputValue( 'invoice_type' );
     validated_data[ 'kreditor' ] = getInputValue( 'kreditor' );
     validated_data[ 'name' ] = getInputValue( 'name' );
     validated_data[ 'rg_nummer' ] = getInputValue( 'rg_nummer' );
-    validated_data[ 'rg_datum' ] = getInputValue( 'rg_datum' );
+    validated_data[ 'invoice_date' ] = getInputValue( 'invoice_date' );
     validated_data[ 'waehrung' ] = getInputValue( 'waehrung' );
     validated_data[ 'endbetrag' ] = getInputValue( 'endbetrag' );
     validated_data[ 'esr_konto' ] = getInputValue( 'esr_konto' );
@@ -247,19 +247,19 @@ function collectExtractorContainerData() {
 
 function fillExtractorSidebar ( json ) {
     removeInputsFromExtractorContainer();
-    addInputDiv ( 'Rechnungsart (R/G)', json, 'rechnungsart', validators.validate_rechnungsart);
-    addInputDiv ( 'Kreditor', json, 'kreditor', validators.validate_kreditor );
-    addInputDiv ( 'Name', json, 'name' );
-    addInputDiv ( 'Rg. Nummer', json, 'rg_nummer', validators.validate_rg_nummer );
-    addInputDiv ( 'Rg. Datum', json, 'rg_datum', validators.validate_rg_datum );
-    addInputDiv ( 'Währung', json, 'waehrung', validators.validate_waehrung );
-    addInputDiv ( 'Endbetrag', json, 'endbetrag', validators.validate_endbetrag );
-    addInputDiv ( 'ESR Konto', json, 'esr_konto', validators.validate_esr_konto );
-    addInputDiv ( 'ESR Referenz', json, 'esr_referenz', validators.validate_esr_referenz );
-    addInputDiv ( 'MwSt-Nr.', json, 'mwst' );
-    addInputDiv ( 'IBAN', json, 'iban' );
-    addInputDiv ( 'Email', json, 'email' );
-    addInputDiv ( 'Telefon', json, 'telefon' );
+    addInputDiv ( 'Rechnungsart (R/G)', json, 'invoice_type', validators.validate_rechnungsart);
+    // addInputDiv ( 'Kreditor', json, 'kreditor', validators.validate_kreditor );
+    // addInputDiv ( 'Name', json, 'name' );
+    // addInputDiv ( 'Rg. Nummer', json, 'rg_nummer', validators.validate_rg_nummer );
+    addInputDiv ( 'Rg. Datum', json, 'invoice_date', validators.validate_invoice_date );
+    // addInputDiv ( 'Währung', json, 'waehrung', validators.validate_waehrung );
+    // addInputDiv ( 'Endbetrag', json, 'endbetrag', validators.validate_endbetrag );
+    // addInputDiv ( 'ESR Konto', json, 'esr_konto', validators.validate_esr_konto );
+    // addInputDiv ( 'ESR Referenz', json, 'esr_referenz', validators.validate_esr_referenz );
+    // addInputDiv ( 'MwSt-Nr.', json, 'mwst' );
+    // addInputDiv ( 'IBAN', json, 'iban' );
+    // addInputDiv ( 'Email', json, 'email' );
+    // addInputDiv ( 'Telefon', json, 'telefon' );
 }
 
 function addInputDiv ( name, json, key, validateFunc ) {

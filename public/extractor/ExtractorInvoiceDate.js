@@ -1,6 +1,5 @@
 // Requirements
 var Extractor = require( './Extractor.js' );
-//import {Extractor} from 'Extractor';
 
 /**
  * Extracts the invoice date from the pdf text

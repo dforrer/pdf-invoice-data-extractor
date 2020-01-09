@@ -15,10 +15,13 @@ var ExtractorInvoiceDate = require( './public/extractor/ExtractorInvoiceDate.js'
 function parseJsonAndExport ( data, cb ) {
     var pdf_text = parseJSON( data );
     var extracted_data = {};
+
     var invoice_type = new ExtractorInvoiceType( pdf_text, extracted_data );
     extracted_data.invoice_type = invoice_type.extract();
+
     var invoice_date = new ExtractorInvoiceDate( pdf_text, extracted_data );
     extracted_data.invoice_date = invoice_date.extract();
+
     // console.log(output);
     // extracted_data = cleanup_extracted_data(extracted_data);
     // extracted_data = keepTopFive(extracted_data);

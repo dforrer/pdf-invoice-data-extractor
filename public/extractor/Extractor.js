@@ -26,7 +26,7 @@ class Extractor {
     extract() {
         var matches = this.extractRegex( this.pdf_text );
         var matches_clean = this.iterate_matches_cleanup( matches );
-        return this.keepTopFive( matches_clean );
+        return matches_clean.slice( 0, 5 ); // keep only the top 5 matches
     }
 
     /**
@@ -82,15 +82,6 @@ class Extractor {
         }
         return rv;
     }
-
-    /**
-     * @param {Array} arr
-     * @returns {Array}
-     * @private
-     */
-    keepTopFive (arr) {
-        return arr.slice(0,5);
-    }
-
 }
+
 module.exports = Extractor;

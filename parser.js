@@ -1,52 +1,65 @@
 // Requirements
 const settings = require('./settings.json')
-const suppliers_loader = require( './public/extractor/suppliers_loader.js' );
-suppliers_loader.loadSuppliers( settings[ 'suppliers_csv_path' ], function () {
+const suppliers_loader = require('./public/extractor/suppliers_loader.js');
+suppliers_loader.loadSuppliers(settings['suppliers_csv_path'], function () {
     console.log('loadSuppliers finished');
 });
+const sidebar_config = require('./public/extractor/chde_invoice.json');
 
-var ExtractorInvoiceType = require( './public/extractor/ExtractorInvoiceType.js' );
-var ExtractorInvoiceDate = require( './public/extractor/ExtractorInvoiceDate.js' );
-
-//import {ExtractorInvoiceDate} from 'ExtractorInvoiceDate';
-//import {ExtractorInvoiceType} from 'ExtractorInvoiceType';
+// var ExtractorInvoiceType = require('./public/extractor/ExtractorInvoiceType.js');
+// var ExtractorInvoiceNumber = require('./public/extractor/ExtractorInvoiceNumber.js');
+// var ExtractorInvoiceDate = require('./public/extractor/ExtractorInvoiceDate.js');
 
 // Main function
 function parseJsonAndExport ( data, cb ) {
     var pdf_text = parseJSON( data );
     var extracted_data = {};
 
-    var invoice_type = new ExtractorInvoiceType( pdf_text, extracted_data );
-    extracted_data.invoice_type = invoice_type.extract();
-
-    var invoice_date = new ExtractorInvoiceDate( pdf_text, extracted_data );
-    extracted_data.invoice_date = invoice_date.extract();
+    for ( var i = 0; i < sidebar_config.extractor_container_fields.length ; i++ ) {
+        var f = sidebar_config.extractor_container_fields[ i ];
+        try {
+            var ExtractorClass = require('./public/extractor/classes/' + f.extractor_class + '.js');
+            var invoice_attribute = new ExtractorClass( pdf_text, extracted_data );
+            extracted_data[f.field] = invoice_attribute.extract();
+        } catch ( e ) {
+            extracted_data[f.field] = [];
+        }
+    }
+    console.log(extracted_data);
+    // var invoice_type = new ExtractorInvoiceType( pdf_text, extracted_data );
+    // extracted_data.invoice_type = invoice_type.extract();
+    //
+    // var invoice_number = new ExtractorInvoiceNumber( pdf_text, extracted_data );
+    // extracted_data.invoice_number = invoice_number.extract();
+    //
+    // var invoice_date = new ExtractorInvoiceDate( pdf_text, extracted_data );
+    // extracted_data.invoice_date = invoice_date.extract();
 
     // console.log(output);
     // extracted_data = cleanup_extracted_data(extracted_data);
     // extracted_data = keepTopFive(extracted_data);
-    // extracted_data = addSupplierToExtractedData(extracted_data);
+    extracted_data = addSupplierToExtractedData(extracted_data);
 
     cb( pdf_text, extracted_data );
 }
 
 function addSupplierToExtractedData ( extracted_data ) {
-    // find supplier for IBAN
-    for ( var i = 0 ; i < extracted_data.iban.length ; i++ ) {
-        var ibanValue = extracted_data.iban[i].value;
+    // find supplier for vendor_iban
+    for ( var i = 0 ; i < extracted_data.vendor_iban.length ; i++ ) {
+        var ibanValue = extracted_data.vendor_iban[i].value;
         var res = suppliers_loader.getSupplierForIban( ibanValue );
         if ( res.posting_block == true ) {
             continue;
         }
         if ( res != 0 ) {
-            // add kreditor to extracted_data
-            extracted_data.kreditor = [{
-                match: extracted_data.iban[i].match,
+            // add vendor_id to extracted_data
+            extracted_data.vendor_id = [{
+                match: extracted_data.vendor_iban[i].match,
                 value: res.id,
                 position: 0
             }];
-            extracted_data.name = [{
-                match: extracted_data.iban[i].match,
+            extracted_data.vendor_name = [{
+                match: extracted_data.vendor_iban[i].match,
                 value: res.name1,
                 position: 0
             }];
@@ -54,22 +67,22 @@ function addSupplierToExtractedData ( extracted_data ) {
         }
     }
 
-    // find supplier for UID
-    for ( var i = 0 ; i < extracted_data.mwst.length ; i++ ) {
-        var mwstValue = extracted_data.mwst[i].value;
+    // find supplier for vendor_vat_number
+    for ( var i = 0 ; i < extracted_data.vendor_vat_number.length ; i++ ) {
+        var mwstValue = extracted_data.vendor_vat_number[i].value;
         var res = suppliers_loader.getSupplierForUid( mwstValue );
         if ( res.posting_block == true ) {
             continue;
         }
         if ( res != 0 ) {
-            // add kreditor to extracted_data
-            extracted_data.kreditor = [{
-                match: extracted_data.mwst[i].match,
+            // add vendor_id to extracted_data
+            extracted_data.vendor_id = [{
+                match: extracted_data.vendor_vat_number[i].match,
                 value: res.id,
                 position: 0
             }];
-            extracted_data.name = [{
-                match: extracted_data.mwst[i].match,
+            extracted_data.vendor_name = [{
+                match: extracted_data.vendor_vat_number[i].match,
                 value: res.name1,
                 position: 0
             }];
@@ -77,12 +90,12 @@ function addSupplierToExtractedData ( extracted_data ) {
         }
     }
 
-    extracted_data.kreditor = [{
+    extracted_data.vendor_id = [{
         match: '',
         value: '',
         position: 0
     }];
-    extracted_data.name = [{
+    extracted_data.vendor_name = [{
         match: '',
         value: '',
         position: 0

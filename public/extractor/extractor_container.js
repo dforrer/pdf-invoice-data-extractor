@@ -2,6 +2,7 @@
 const {ipcRenderer} = require('electron');
 const validators    = require('../extractor/validators.js');
 const settings      = require('./../../settings.json');
+const sidebar_config = require('../extractor/chde_invoice.json');
 
 // Model variables
 var pdf_queue       = [];
@@ -229,30 +230,43 @@ function getInputValue( inputname ) {
 
 function collectExtractorContainerData() {
     var validated_data = {};
-    validated_data[ 'invoice_type' ] = getInputValue( 'invoice_type' );
-    validated_data[ 'kreditor' ] = getInputValue( 'kreditor' );
-    validated_data[ 'name' ] = getInputValue( 'name' );
-    validated_data[ 'rg_nummer' ] = getInputValue( 'rg_nummer' );
-    validated_data[ 'invoice_date' ] = getInputValue( 'invoice_date' );
-    validated_data[ 'waehrung' ] = getInputValue( 'waehrung' );
-    validated_data[ 'endbetrag' ] = getInputValue( 'endbetrag' );
-    validated_data[ 'esr_konto' ] = getInputValue( 'esr_konto' );
-    validated_data[ 'esr_referenz' ] = getInputValue( 'esr_referenz' );
-    validated_data[ 'mwst' ] = getInputValue( 'mwst' );
-    validated_data[ 'iban' ] = getInputValue( 'iban' );
-    validated_data[ 'email' ] = getInputValue( 'email' );
-    validated_data[ 'telefon' ] = getInputValue( 'telefon' );
+    for ( var i = 0; i < sidebar_config.extractor_container_fields.length ; i++ ) {
+        var f = sidebar_config.extractor_container_fields[ i ];
+        validated_data[ f.field ] = getInputValue( f.field );
+    }
+    // validated_data[ 'invoice_type' ] = getInputValue( 'invoice_type' );
+    // validated_data[ 'kreditor' ] = getInputValue( 'kreditor' );
+    // validated_data[ 'name' ] = getInputValue( 'name' );
+    // validated_data[ 'invoice_number' ] = getInputValue( 'invoice_number' );
+    // validated_data[ 'invoice_date' ] = getInputValue( 'invoice_date' );
+    // validated_data[ 'invoice_currency' ] = getInputValue( 'invoice_currency' );
+    // validated_data[ 'endbetrag' ] = getInputValue( 'endbetrag' );
+    // validated_data[ 'esr_konto' ] = getInputValue( 'esr_konto' );
+    // validated_data[ 'esr_referenz' ] = getInputValue( 'esr_referenz' );
+    // validated_data[ 'mwst' ] = getInputValue( 'mwst' );
+    // validated_data[ 'iban' ] = getInputValue( 'iban' );
+    // validated_data[ 'email' ] = getInputValue( 'email' );
+    // validated_data[ 'telefon' ] = getInputValue( 'telefon' );
     return validated_data;
 }
 
 function fillExtractorSidebar ( json ) {
     removeInputsFromExtractorContainer();
-    addInputDiv ( 'Rechnungsart (R/G)', json, 'invoice_type', validators.validate_rechnungsart);
-    // addInputDiv ( 'Kreditor', json, 'kreditor', validators.validate_kreditor );
-    // addInputDiv ( 'Name', json, 'name' );
-    // addInputDiv ( 'Rg. Nummer', json, 'rg_nummer', validators.validate_rg_nummer );
-    addInputDiv ( 'Rg. Datum', json, 'invoice_date', validators.validate_invoice_date );
-    // addInputDiv ( 'Währung', json, 'waehrung', validators.validate_waehrung );
+    for ( var i = 0; i < sidebar_config.extractor_container_fields.length ; i++ ) {
+        var f = sidebar_config.extractor_container_fields[ i ];
+        try {
+            var ValidatorClass = require('../extractor/classes/' + f.validator_class + '.js');
+            addInputDiv ( f.display_name, json, f.field, new ValidatorClass().validate );
+        } catch ( e ) {
+            addInputDiv ( f.display_name, json, f.field );
+        }
+    }
+    // addInputDiv ( 'Rechnungsart (R/G)', json, 'invoice_type', new ValidatorInvoiceType().validate );
+    // // addInputDiv ( 'Kreditor', json, 'kreditor', validators.validate_kreditor );
+    // // addInputDiv ( 'Name', json, 'name' );
+    // addInputDiv ( 'Rg. Nummer', json, 'invoice_number', new ValidatorInvoiceNumber().validate );
+    // addInputDiv ( 'Rg. Datum', json, 'invoice_date', new ValidatorDate().validate );
+    // addInputDiv ( 'Währung', json, 'invoice_currency', new ValidatorInvoiceCurrency().validate );
     // addInputDiv ( 'Endbetrag', json, 'endbetrag', validators.validate_endbetrag );
     // addInputDiv ( 'ESR Konto', json, 'esr_konto', validators.validate_esr_konto );
     // addInputDiv ( 'ESR Referenz', json, 'esr_referenz', validators.validate_esr_referenz );

@@ -45,8 +45,8 @@ class Extractor {
     iterate_matches_cleanup( obj ) {
         var arr = [];
         for ( const p of Object.entries( obj ) ) {
-            var key   = p[0];
-            var value = p[1];
+            var key = p[ 0 ];
+            var value = p[ 1 ];
             var r = this.cleanup( key, value );
             if ( r !== null ) {
                 arr.push( r );
@@ -62,23 +62,25 @@ class Extractor {
      */
     loopMatches( str, pattern ) {
         var rv = {};
-        let match = pattern.exec(str);
+        let match = pattern.exec( str );
         while ( match != null ) {
-            var entry = { i: match.index }; // index
+            var entry = {
+                i: match.index
+            }; // index
             // remove undefined results from array
-            match = match.filter(function (el) {
+            match = match.filter( function( el ) {
                 return el != null;
-            });
+            } );
 
-            entry.g1 = match[1]; // group 1
-            match[2] != undefined ? entry.g2 = match[2]:1; // group 2
-            match[3] != undefined ? entry.g3 = match[3]:1; // group 3
-            var m = match[0].trim();
-            if ( !rv[m] ) {
+            entry.g1 = match[ 1 ]; // group 1
+            match[ 2 ] != undefined ? entry.g2 = match[ 2 ] : 1; // group 2
+            match[ 3 ] != undefined ? entry.g3 = match[ 3 ] : 1; // group 3
+            var m = match[ 0 ].trim();
+            if ( !rv[ m ] ) {
                 // key doesn't exist yet
-                rv[m] = entry;
+                rv[ m ] = entry;
             }
-            match = pattern.exec(str);
+            match = pattern.exec( str );
         }
         return rv;
     }

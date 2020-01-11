@@ -147,7 +147,7 @@ function validate_waehrung ( str ) {
 function validate_endbetrag ( str ) {
     var rv = { input: str, valid: true, default: false };
     // remove whitespace from front and end and split
-    outputSplit = str.trim().split('');
+    var outputSplit = str.trim().split('');
     if ( outputSplit[ outputSplit.length - 2 ] == ' ' ) {
         outputSplit.splice( outputSplit.length - 2);
     }

@@ -58,21 +58,21 @@
         },
         {
             "field": "invoice_esr_amount",
-            "display_name": "ESR Betrag",
+            "display_name": null,
             "extractor_class": "ExtractorInvoiceEsrAmount",
-            "validator_class": "ValidatorInvoiceEsrAmount"
+            "validator_class": null
         },
         {
             "field": "vendor_vat_number",
             "display_name": "MwSt-Nr.",
             "extractor_class": "ExtractorVendorVatNumber",
-            "validator_class": "ValidatorVendorVatNumber"
+            "validator_class": null
         },
         {
             "field": "vendor_iban",
             "display_name": "IBAN",
             "extractor_class": "ExtractorVendorIban",
-            "validator_class": "ValidatorVendorIban"
+            "validator_class": null
         },
         {
             "field": "vendor_email",

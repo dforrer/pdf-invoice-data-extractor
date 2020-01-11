@@ -1,23 +1,25 @@
 // Requirements
-const {ipcRenderer} = require('electron');
-const validators    = require('../extractor/validators.js');
-const settings      = require('./../../settings.json');
-const sidebar_config = require('../extractor/chde_invoice.json');
+const {
+    ipcRenderer
+} = require( 'electron' );
+const validators = require( '../extractor/validators.js' );
+const settings = require( './../../settings.json' );
+const sidebar_config = require( '../extractor/chde_invoice.json' );
 
 // Model variables
-var pdf_queue       = [];
+var pdf_queue = [];
 var pdf_queue_index = 0;
 
 // GUI variables
-var viewer          = null; // div 'viewer' reference from PDFViewerApplication
-var viewerSpans     = []; // Array of all the span-elements inside the viewer div
-var isMouseDown     = false;
-var mouseDownCache  = ''; // string to store the content of the current selection
-var previousTarget  = null;
-var focusedInput    = null;
+var viewer = null; // div 'viewer' reference from PDFViewerApplication
+var viewerSpans = []; // Array of all the span-elements inside the viewer div
+var isMouseDown = false;
+var mouseDownCache = ''; // string to store the content of the current selection
+var previousTarget = null;
+var focusedInput = null;
 
 // Model object declarations
-function PDF ( filepath, extracted_data ) {
+function PDF( filepath, extracted_data ) {
     this.filepath = filepath;
     this.extracted_data = extracted_data;
 }
@@ -26,33 +28,33 @@ function PDF ( filepath, extracted_data ) {
 
 
 // Register keyboard shortcuts
-window.addEventListener('keyup', function (e) {
-    if (e.ctrlKey  &&  e.key.toLowerCase() === "n") {
+window.addEventListener( 'keyup', function( e ) {
+    if ( e.ctrlKey && e.key.toLowerCase() === "n" ) {
         nextPDF( 1 );
-    } else if (e.ctrlKey  &&  e.key.toLowerCase() === "b") {
+    } else if ( e.ctrlKey && e.key.toLowerCase() === "b" ) {
         nextPDF( -1 );
     }
-});
+} );
 
-function waitForElement(){
+function waitForElement() {
     try {
         // try registering a callback on the PDFViewerApplication eventbus
         PDFViewerApplication.pdfViewer.eventBus.on( 'textlayerrendered', registerSpanOnMouseOver );
-    } catch (e) {
-        setTimeout(waitForElement, 250);
+    } catch ( e ) {
+        setTimeout( waitForElement, 250 );
     }
 }
 
 waitForElement();
 
-function mousemoveHandler ( e ) {
+function mousemoveHandler( e ) {
     if ( isMouseDown && e.target !== previousTarget ) {
         mouseDownCache += '' + e.target.innerText;
     }
     previousTarget = e.target;
 }
 
-function dblclickHandler (e) {
+function dblclickHandler( e ) {
     if ( e.target !== previousTarget ) {
         mouseDownCache += e.target.innerText;
     }
@@ -63,33 +65,33 @@ function dblclickHandler (e) {
     }
 }
 
-function addSpanEventListener () {
-    for ( var i = 0; i < viewerSpans.length; i++) {
-        viewerSpans[i].addEventListener( 'mousemove', mousemoveHandler );
-        viewerSpans[i].addEventListener( 'dblclick', dblclickHandler );
+function addSpanEventListener() {
+    for ( var i = 0; i < viewerSpans.length; i++ ) {
+        viewerSpans[ i ].addEventListener( 'mousemove', mousemoveHandler );
+        viewerSpans[ i ].addEventListener( 'dblclick', dblclickHandler );
     }
 }
 
-function removeSpanEventListener () {
-    for ( var i = 0; i < viewerSpans.length; i++) {
-        viewerSpans[i].removeEventListener( 'mousemove', mousemoveHandler );
-        viewerSpans[i].removeEventListener( 'dblclick', dblclickHandler );
+function removeSpanEventListener() {
+    for ( var i = 0; i < viewerSpans.length; i++ ) {
+        viewerSpans[ i ].removeEventListener( 'mousemove', mousemoveHandler );
+        viewerSpans[ i ].removeEventListener( 'dblclick', dblclickHandler );
     }
 }
 
 function registerSpanOnMouseOver() {
     removeSpanEventListener();
-    viewerSpans = Array.from(viewer.getElementsByTagName('span'));
+    viewerSpans = Array.from( viewer.getElementsByTagName( 'span' ) );
     addSpanEventListener();
 }
 
-function mousedownHandlerViewer ( e ) {
+function mousedownHandlerViewer( e ) {
     isMouseDown = true;
     mouseDownCache = "";
     previousTarget = null;
 }
 
-function mouseupHandlerViewer ( e ) {
+function mouseupHandlerViewer( e ) {
     isMouseDown = false;
     mouseDownCache = mouseDownCache.trim();
     if ( mouseDownCache.length > 0 ) {
@@ -98,14 +100,14 @@ function mouseupHandlerViewer ( e ) {
     }
 }
 
-function unregisterMouseEvents () {
+function unregisterMouseEvents() {
     if ( viewer ) {
         viewer.removeEventListener( 'mousedown', mousedownHandlerViewer );
         viewer.removeEventListener( 'mouseup', mouseupHandlerViewer );
     }
 }
 
-function registerMouseEvents () {
+function registerMouseEvents() {
     viewer = document.getElementById( 'viewer' );
     viewer.addEventListener( 'mousedown', mousedownHandlerViewer );
     viewer.addEventListener( 'mouseup', mouseupHandlerViewer );
@@ -113,7 +115,7 @@ function registerMouseEvents () {
 
 function setupIPC() {
     // In renderer process (web page).
-    ipcRenderer.on('data-extraction-done', (event, arg) => {
+    ipcRenderer.on( 'data-extraction-done', ( event, arg ) => {
         var newPDF = new PDF( arg.filepath, arg.extracted_data );
         delete newPDF.extracted_data.seiten;
         pdf_queue.push( newPDF );
@@ -122,28 +124,28 @@ function setupIPC() {
             pdf_queue_index = -1;
             nextPDF( 1 );
         }
-    });
+    } );
 }
 
-function setFocusToInput( inputname ){
+function setFocusToInput( inputname ) {
     document.getElementById( inputname ).focus();
 }
 
 function registerDropAreaEvent() {
-    document.getElementById('pdf_drop_area').addEventListener('drop', (e) => {
+    document.getElementById( 'pdf_drop_area' ).addEventListener( 'drop', ( e ) => {
         e.preventDefault();
         e.stopPropagation();
 
-        for (const f of e.dataTransfer.files) {
-            console.log('File(s) you dragged here: ', f.path)
+        for ( const f of e.dataTransfer.files ) {
+            console.log( 'File(s) you dragged here: ', f.path )
             var newPDF = new PDF( f.path, undefined );
             ipcRenderer.send( 'extract-data-from-pdf', newPDF );
         }
-    });
-    document.getElementById('pdf_drop_area').addEventListener('dragover', (e) => {
+    } );
+    document.getElementById( 'pdf_drop_area' ).addEventListener( 'dragover', ( e ) => {
         e.preventDefault();
         e.stopPropagation();
-    });
+    } );
 }
 
 function nextPDF( plusMinusOne ) {
@@ -167,25 +169,25 @@ function nextPDF( plusMinusOne ) {
 }
 
 function deletePDFFromQueue() {
-    console.log('deletePDFFromQueue called');
-    pdf_queue.splice(pdf_queue_index, 1);
+    console.log( 'deletePDFFromQueue called' );
+    pdf_queue.splice( pdf_queue_index, 1 );
     if ( pdf_queue_index >= 1 ) {
         pdf_queue_index -= 1;
     }
     nextPDF( -1 );
 }
 
-function updateButtonLoadNextPDF () {
-    var el = document.getElementById('current_pdf');
-    if (pdf_queue.length > 0) {
-        el.innerHTML = (pdf_queue_index + 1) + "/" +  pdf_queue.length ;
+function updateButtonLoadNextPDF() {
+    var el = document.getElementById( 'current_pdf' );
+    if ( pdf_queue.length > 0 ) {
+        el.innerHTML = ( pdf_queue_index + 1 ) + "/" + pdf_queue.length;
     } else {
         el.innerHTML = "0/0";
     }
 }
 
 function exportPDFData() {
-    console.log('exportPDFData called');
+    console.log( 'exportPDFData called' );
     if ( pdf_queue.length > 0 ) {
         var pdf = pdf_queue[ pdf_queue_index ];
         pdf.validated_data = collectExtractorContainerData();
@@ -197,40 +199,40 @@ function exportPDFData() {
 
 function loadJSONData() {
     var url = new URL( window.location.href );
-    var path = url.searchParams.get("file");
-    path = path.slice(0, -4);
+    var path = url.searchParams.get( "file" );
+    path = path.slice( 0, -4 );
     path = path + '.txt';
     // load JSON for PDF file
     fetch( path )
-      .then(response => {
-        return response.json()
-      })
-      .then(data => {
-        // Work with JSON data here
-        delete data.seiten;
-        fillExtractorSidebar(data);
-      })
-      .catch(err => {
-        // Do something for an error here
-        console.error('ERROR loading JSON');
-      })
+        .then( response => {
+            return response.json()
+        } )
+        .then( data => {
+            // Work with JSON data here
+            delete data.seiten;
+            fillExtractorSidebar( data );
+        } )
+        .catch( err => {
+            // Do something for an error here
+            console.error( 'ERROR loading JSON' );
+        } )
 }
 
 function removeInputsFromExtractorContainer() {
-    var extractorContainer = document.getElementById('extracted_data');
+    var extractorContainer = document.getElementById( 'extracted_data' );
     // remove all childnodes
-    while (extractorContainer.firstChild) {
-        extractorContainer.removeChild(extractorContainer.firstChild);
+    while ( extractorContainer.firstChild ) {
+        extractorContainer.removeChild( extractorContainer.firstChild );
     }
 }
 
 function getInputValue( inputname ) {
-    return document.getElementById( 'input_' +inputname ).value;
+    return document.getElementById( 'input_' + inputname ).value;
 }
 
 function collectExtractorContainerData() {
     var validated_data = {};
-    for ( var i = 0; i < sidebar_config.extractor_container_fields.length ; i++ ) {
+    for ( var i = 0; i < sidebar_config.extractor_container_fields.length; i++ ) {
         var f = sidebar_config.extractor_container_fields[ i ];
         validated_data[ f.field ] = getInputValue( f.field );
     }
@@ -250,15 +252,17 @@ function collectExtractorContainerData() {
     return validated_data;
 }
 
-function fillExtractorSidebar ( json ) {
+function fillExtractorSidebar( json ) {
     removeInputsFromExtractorContainer();
-    for ( var i = 0; i < sidebar_config.extractor_container_fields.length ; i++ ) {
+    for ( var i = 0; i < sidebar_config.extractor_container_fields.length; i++ ) {
         var f = sidebar_config.extractor_container_fields[ i ];
-        try {
-            var ValidatorClass = require('../extractor/classes/' + f.validator_class + '.js');
-            addInputDiv ( f.display_name, json, f.field, new ValidatorClass().validate );
-        } catch ( e ) {
-            addInputDiv ( f.display_name, json, f.field );
+        if ( f.display_name != null ) {
+            try {
+                var ValidatorClass = require( '../extractor/classes/' + f.validator_class + '.js' );
+                addInputDiv( f.display_name, json, f.field, new ValidatorClass().validate );
+            } catch ( e ) {
+                addInputDiv( f.display_name, json, f.field );
+            }
         }
     }
     // addInputDiv ( 'Rechnungsart (R/G)', json, 'invoice_type', new ValidatorInvoiceType().validate );
@@ -276,45 +280,47 @@ function fillExtractorSidebar ( json ) {
     // addInputDiv ( 'Telefon', json, 'telefon' );
 }
 
-function addInputDiv ( name, json, key, validateFunc ) {
-    var div_register = document.createElement('div');
-    div_register.setAttribute('class', 'register');
+function addInputDiv( name, json, key, validateFunc ) {
+    var div_register = document.createElement( 'div' );
+    div_register.setAttribute( 'class', 'register' );
 
-    var div_field = document.createElement('div');
-    div_field.setAttribute('class', 'field');
+    var div_field = document.createElement( 'div' );
+    div_field.setAttribute( 'class', 'field' );
 
-    var label = document.createElement('label');
-    label.setAttribute('for', 'register');
+    var label = document.createElement( 'label' );
+    label.setAttribute( 'for', 'register' );
 
-    var span = document.createElement('span');
+    var span = document.createElement( 'span' );
     span.innerHTML = name;
 
-    var input = document.createElement('input');
+    var input = document.createElement( 'input' );
     var inputname = 'input_' + key;
     input.setAttribute( 'Id', inputname );
     input.setAttribute( 'name', key );
     input.setAttribute( 'class', 'valid' );
     input.type = 'text';
     input.readonly = true;
-    var match = json[key][0];
+    var match = json[ key ][ 0 ];
     if ( match ) {
         input.value = match.value;
-        input.ondblclick = function() { searchPDF(match.match); }
+        input.ondblclick = function() {
+            searchPDF( match.match );
+        }
     }
-    input.addEventListener( 'focus', function ( e ) {
+    input.addEventListener( 'focus', function( e ) {
         focusedInput = e.target;
-    });
+    } );
 
-    var input_validation = function ( e ) {
+    var input_validation = function( e ) {
         if ( validateFunc ) {
             var rv = validateFunc( e.target.value );
             e.target.value = rv.output;
             if ( rv.valid === false ) {
-                e.target.classList.remove('valid');
-                e.target.classList.add('invalid');
+                e.target.classList.remove( 'valid' );
+                e.target.classList.add( 'invalid' );
             } else {
-                e.target.classList.remove('invalid');
-                e.target.classList.add('valid');
+                e.target.classList.remove( 'invalid' );
+                e.target.classList.add( 'valid' );
             }
         }
     };
@@ -322,32 +328,32 @@ function addInputDiv ( name, json, key, validateFunc ) {
     input.addEventListener( 'blur', input_validation );
 
     // validate input on ENTER keypress
-    input.addEventListener( 'keypress', function ( e ) {
+    input.addEventListener( 'keypress', function( e ) {
         var keypress = e.which || e.keyCode;
         if ( keypress === 13 ) { // 13 is enter
             input_validation( e );
         }
-    });
+    } );
 
     // Putting it all together
-    label.appendChild(span);
-    div_field.appendChild(label);
-    div_field.appendChild(input);
-    div_register.appendChild(div_field);
-    var extractorContainer = document.getElementById('extracted_data');
+    label.appendChild( span );
+    div_field.appendChild( label );
+    div_field.appendChild( input );
+    div_register.appendChild( div_field );
+    var extractorContainer = document.getElementById( 'extracted_data' );
     extractorContainer.appendChild( div_register );
 }
 
 /*
  * Triggers the "findagain" search event from viewer.js
  */
-function searchPDF ( searchText ) {
-    PDFViewerApplication.findController.executeCommand('findagain', {
-      query: searchText,
-      phraseSearch: true,
-      caseSensitive: false,
-      entireWord: false,
-      highlightAll: false,
-      findPrevious: undefined
-    });
+function searchPDF( searchText ) {
+    PDFViewerApplication.findController.executeCommand( 'findagain', {
+        query: searchText,
+        phraseSearch: true,
+        caseSensitive: false,
+        entireWord: false,
+        highlightAll: false,
+        findPrevious: undefined
+    } );
 }

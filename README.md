@@ -7,7 +7,7 @@
 - Extracts invoice data by evaluating multiple regular expressions against the plain text of the pdf document
 - Provides a GUI for data validation
 - Electron app with node.js backend
-- Creditor matching based on UID (CHE-xxx.xxx.xxx), IBAN from separate CSV-list
+- Vendor matching based on UID (CHE-xxx.xxx.xxx), IBAN from separate CSV-list
 - Export format options: JSON, XML
 - Focus on scanned documents with a scan resolution of 300 dpi and black and white only.
 

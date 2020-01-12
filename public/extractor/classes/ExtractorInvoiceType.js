@@ -49,6 +49,24 @@ class ExtractorInvoiceType extends Extractor {
         r.position = value.i;
         return r;
     }
+
+    /**
+     * @param {Object} obj
+     * @returns {Array} arr
+     * @private
+     */
+    iterate_matches_cleanup( obj ) {
+        var arr = super.iterate_matches_cleanup( obj );
+        // set default value
+        if ( arr.length === 0 ) {
+            arr.push( {
+                match: "",
+                position: 0,
+                value: "R"
+            } );
+        }
+        return arr;
+    }
 }
 
 module.exports = ExtractorInvoiceType;

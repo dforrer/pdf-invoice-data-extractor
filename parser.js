@@ -4,42 +4,24 @@ const suppliers_loader = require('./public/extractor/suppliers_loader.js');
 suppliers_loader.loadSuppliers(settings['suppliers_csv_path'], function () {
     console.log('loadSuppliers finished');
 });
-const sidebar_config = require('./public/extractor/chde_invoice.json');
-
-// var ExtractorInvoiceType = require('./public/extractor/ExtractorInvoiceType.js');
-// var ExtractorInvoiceNumber = require('./public/extractor/ExtractorInvoiceNumber.js');
-// var ExtractorInvoiceDate = require('./public/extractor/ExtractorInvoiceDate.js');
+const sidebar_config = require( settings.sidebar_config );
 
 // Main function
 function parseJsonAndExport ( data, cb ) {
     var pdf_text = parseJSON( data );
     var extracted_data = {};
-
-    for ( var i = 0; i < sidebar_config.extractor_container_fields.length ; i++ ) {
+    for ( var i = 0; i < sidebar_config.extractor_container_fields.length; i++ ) {
         var f = sidebar_config.extractor_container_fields[ i ];
         try {
-            var ExtractorClass = require('./public/extractor/classes/' + f.extractor_class + '.js');
-            var invoice_attribute = new ExtractorClass( pdf_text, extracted_data );
-            extracted_data[f.field] = invoice_attribute.extract();
+            var ExtractorClass = require( './public/extractor/classes/' + f.extractor_class + '.js' );
+            var extractorClass = new ExtractorClass( pdf_text, extracted_data );
+            extracted_data[ f.field ] = extractorClass.extract();
         } catch ( e ) {
-            extracted_data[f.field] = [];
+            extracted_data[ f.field ] = [];
         }
     }
     console.log(extracted_data);
-    // var invoice_type = new ExtractorInvoiceType( pdf_text, extracted_data );
-    // extracted_data.invoice_type = invoice_type.extract();
-    //
-    // var invoice_number = new ExtractorInvoiceNumber( pdf_text, extracted_data );
-    // extracted_data.invoice_number = invoice_number.extract();
-    //
-    // var invoice_date = new ExtractorInvoiceDate( pdf_text, extracted_data );
-    // extracted_data.invoice_date = invoice_date.extract();
-
-    // console.log(output);
-    // extracted_data = cleanup_extracted_data(extracted_data);
-    // extracted_data = keepTopFive(extracted_data);
     extracted_data = addSupplierToExtractedData(extracted_data);
-
     cb( pdf_text, extracted_data );
 }
 

@@ -5,85 +5,99 @@
     "extractor_container_fields": [{
             "field": "invoice_type",
             "display_name": "Rechnungsart (R/G)",
+            "display_position": 0,
             "extractor_class": "ExtractorInvoiceType",
             "validator_class": "ValidatorInvoiceType"
         },
         {
-            "field": "vendor_id",
-            "display_name": "Kreditor",
-            "extractor_class": null,
-            "validator_class": null
-        },
-        {
-            "field": "vendor_name",
-            "display_name": "Name",
-            "extractor_class": null,
-            "validator_class": null
-        },
-        {
             "field": "invoice_number",
             "display_name": "Rechnungsnummer",
+            "display_position": 3,
             "extractor_class": "ExtractorInvoiceNumber",
             "validator_class": "ValidatorInvoiceNumber"
         },
         {
             "field": "invoice_date",
             "display_name": "Rechnungdatum",
+            "display_position": 4,
             "extractor_class": "ExtractorInvoiceDate",
             "validator_class": "ValidatorDate"
         },
         {
             "field": "invoice_currency",
             "display_name": "Währung",
+            "display_position": 5,
             "extractor_class": "ExtractorInvoiceCurrency",
             "validator_class": "ValidatorInvoiceCurrency"
         },
         {
-            "field": "invoice_amount_due",
-            "display_name": "Endbetrag",
-            "extractor_class": "ExtractorInvoiceAmountDue",
-            "validator_class": "ValidatorAmount"
-        },
-        {
             "field": "invoice_esr_number",
             "display_name": "ESR Konto",
+            "display_position": 7,
             "extractor_class": "ExtractorInvoiceEsrNumber",
             "validator_class": "ValidatorInvoiceEsrNumber"
         },
         {
             "field": "invoice_esr_reference",
             "display_name": "ESR Referenz",
+            "display_position": 8,
             "extractor_class": "ExtractorInvoiceEsrReference",
             "validator_class": "ValidatorInvoiceEsrReference"
         },
         {
             "field": "invoice_esr_amount",
             "display_name": null,
+            "display_position": 9,
             "extractor_class": "ExtractorInvoiceEsrAmount",
             "validator_class": null
         },
         {
+            "field": "invoice_amount_due",
+            "display_name": "Endbetrag",
+            "display_position": 6,
+            "extractor_class": "ExtractorInvoiceAmountDue",
+            "validator_class": "ValidatorAmount"
+        },
+        {
             "field": "vendor_vat_number",
             "display_name": "MwSt-Nr.",
+            "display_position": 10,
             "extractor_class": "ExtractorVendorVatNumber",
             "validator_class": null
         },
         {
             "field": "vendor_iban",
             "display_name": "IBAN",
+            "display_position": 11,
             "extractor_class": "ExtractorVendorIban",
             "validator_class": null
         },
         {
             "field": "vendor_email",
             "display_name": "Email",
+            "display_position": 12,
             "extractor_class": "ExtractorVendorEmail",
             "validator_class": null
         },
         {
             "field": "vendor_telephone",
             "display_name": "Telefon",
+            "display_position": 13,
             "extractor_class": "ExtractorVendorTelephone",
+            "validator_class": null
+        },
+        {
+            "field": "vendor_id",
+            "display_name": "Kreditor",
+            "display_position": 1,
+            "extractor_class": "ExtractorVendorId",
+            "validator_class": "ValidatorVendorId"
+        },
+        {
+            "field": "vendor_name",
+            "display_name": "Name",
+            "display_position": 2,
+            "extractor_class": "ExtractorVendorName",
             "validator_class": null
         }
     ]

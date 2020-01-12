@@ -236,26 +236,20 @@ function collectExtractorContainerData() {
         var f = sidebar_config.extractor_container_fields[ i ];
         validated_data[ f.field ] = getInputValue( f.field );
     }
-    // validated_data[ 'invoice_type' ] = getInputValue( 'invoice_type' );
-    // validated_data[ 'kreditor' ] = getInputValue( 'kreditor' );
-    // validated_data[ 'name' ] = getInputValue( 'name' );
-    // validated_data[ 'invoice_number' ] = getInputValue( 'invoice_number' );
-    // validated_data[ 'invoice_date' ] = getInputValue( 'invoice_date' );
-    // validated_data[ 'invoice_currency' ] = getInputValue( 'invoice_currency' );
-    // validated_data[ 'endbetrag' ] = getInputValue( 'endbetrag' );
-    // validated_data[ 'esr_konto' ] = getInputValue( 'esr_konto' );
-    // validated_data[ 'esr_referenz' ] = getInputValue( 'esr_referenz' );
-    // validated_data[ 'mwst' ] = getInputValue( 'mwst' );
-    // validated_data[ 'iban' ] = getInputValue( 'iban' );
-    // validated_data[ 'email' ] = getInputValue( 'email' );
-    // validated_data[ 'telefon' ] = getInputValue( 'telefon' );
     return validated_data;
 }
 
 function fillExtractorSidebar( json ) {
     removeInputsFromExtractorContainer();
-    for ( var i = 0; i < sidebar_config.extractor_container_fields.length; i++ ) {
-        var f = sidebar_config.extractor_container_fields[ i ];
+
+    // sort based on display_position field
+    var sidebar_fields = sidebar_config.extractor_container_fields;
+    sidebar_fields = sidebar_fields.sort( function( a, b ) {
+        return a.display_position - b.display_position;
+    } );
+
+    for ( var i = 0; i < sidebar_fields.length; i++ ) {
+        var f = sidebar_fields[ i ];
         if ( f.display_name != null ) {
             try {
                 var ValidatorClass = require( '../extractor/classes/' + f.validator_class + '.js' );
@@ -265,19 +259,6 @@ function fillExtractorSidebar( json ) {
             }
         }
     }
-    // addInputDiv ( 'Rechnungsart (R/G)', json, 'invoice_type', new ValidatorInvoiceType().validate );
-    // // addInputDiv ( 'Kreditor', json, 'kreditor', validators.validate_kreditor );
-    // // addInputDiv ( 'Name', json, 'name' );
-    // addInputDiv ( 'Rg. Nummer', json, 'invoice_number', new ValidatorInvoiceNumber().validate );
-    // addInputDiv ( 'Rg. Datum', json, 'invoice_date', new ValidatorDate().validate );
-    // addInputDiv ( 'Währung', json, 'invoice_currency', new ValidatorInvoiceCurrency().validate );
-    // addInputDiv ( 'Endbetrag', json, 'endbetrag', validators.validate_endbetrag );
-    // addInputDiv ( 'ESR Konto', json, 'esr_konto', validators.validate_esr_konto );
-    // addInputDiv ( 'ESR Referenz', json, 'esr_referenz', validators.validate_esr_referenz );
-    // addInputDiv ( 'MwSt-Nr.', json, 'mwst' );
-    // addInputDiv ( 'IBAN', json, 'iban' );
-    // addInputDiv ( 'Email', json, 'email' );
-    // addInputDiv ( 'Telefon', json, 'telefon' );
 }
 
 function addInputDiv( name, json, key, validateFunc ) {

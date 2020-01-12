@@ -3,6 +3,9 @@ var Extractor = require( './Extractor.js' );
 
 /**
  * Extracts the invoice amount due from the pdf text
+ * Note:
+ * - invoice_esr_amount should be extracted first
+ *   (see iterate_matches_cleanup)
  * @class
  */
 class ExtractorInvoiceAmountDue extends Extractor {
@@ -59,6 +62,19 @@ class ExtractorInvoiceAmountDue extends Extractor {
         arr = arr.sort( function( a, b ) {
             return parseFloat( b.value ) - parseFloat( a.value );
         } );
+        // if invoice_esr_amount is set replace the invoice_amount_due
+        if ( this.extracted_data.invoice_esr_amount && this.extracted_data.invoice_esr_amount.length > 0 ) {
+            arr = [];
+            // e.g. 0100005310005
+            // cut off first 2 and last character of esr_amount
+            var esr_amount = this.extracted_data.invoice_esr_amount[ 0 ];
+            var esr_amount_float = parseFloat( esr_amount.value.substring( 2, 12 ) ) / 100;
+            arr.push( {
+                match: esr_amount.match,
+                position: esr_amount.position,
+                value: esr_amount_float.toFixed( 2 )
+            } );
+        }
         return arr;
     }
 }

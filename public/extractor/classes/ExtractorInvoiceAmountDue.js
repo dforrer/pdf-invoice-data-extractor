@@ -62,7 +62,7 @@ class ExtractorInvoiceAmountDue extends Extractor {
         arr = arr.sort( function( a, b ) {
             return parseFloat( b.value ) - parseFloat( a.value );
         } );
-        // if invoice_esr_amount is set replace the invoice_amount_due
+        // if invoice_esr_amount is set, replace the invoice_amount_due
         if ( this.extracted_data.invoice_esr_amount && this.extracted_data.invoice_esr_amount.length > 0 ) {
             arr = [];
             // e.g. 0100005310005

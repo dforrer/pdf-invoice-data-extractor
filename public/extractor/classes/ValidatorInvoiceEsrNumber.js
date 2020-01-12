@@ -1,4 +1,5 @@
 // Requirements
+const util = require( './util.js' );
 
 /**
  * Validates an ESR number and returns a JS-object

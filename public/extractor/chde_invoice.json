@@ -80,10 +80,10 @@
             "validator_class": null
         },
         {
-            "field": "vendor_telephone",
+            "field": "vendor_phone",
             "display_name": "Telefon",
             "display_position": 13,
-            "extractor_class": "ExtractorVendorTelephone",
+            "extractor_class": "ExtractorVendorPhone",
             "validator_class": null
         },
         {

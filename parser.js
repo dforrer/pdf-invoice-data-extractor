@@ -14,84 +14,13 @@ function parseJsonAndExport ( data, cb ) {
         var f = sidebar_config.extractor_container_fields[ i ];
         try {
             var ExtractorClass = require( './public/extractor/classes/' + f.extractor_class + '.js' );
-            var extractorClass = new ExtractorClass( pdf_text, extracted_data );
+            var extractorClass = new ExtractorClass( pdf_text, extracted_data, suppliers_loader );
             extracted_data[ f.field ] = extractorClass.extract();
         } catch ( e ) {
             extracted_data[ f.field ] = [];
         }
     }
-    console.log(extracted_data);
-    extracted_data = addSupplierToExtractedData(extracted_data);
     cb( pdf_text, extracted_data );
-}
-
-function addSupplierToExtractedData ( extracted_data ) {
-    // find supplier for vendor_iban
-    for ( var i = 0 ; i < extracted_data.vendor_iban.length ; i++ ) {
-        var ibanValue = extracted_data.vendor_iban[i].value;
-        var res = suppliers_loader.getSupplierForIban( ibanValue );
-        if ( res.posting_block == true ) {
-            continue;
-        }
-        if ( res != 0 ) {
-            // add vendor_id to extracted_data
-            extracted_data.vendor_id = [{
-                match: extracted_data.vendor_iban[i].match,
-                value: res.id,
-                position: 0
-            }];
-            extracted_data.vendor_name = [{
-                match: extracted_data.vendor_iban[i].match,
-                value: res.name1,
-                position: 0
-            }];
-            return extracted_data;
-        }
-    }
-
-    // find supplier for vendor_vat_number
-    for ( var i = 0 ; i < extracted_data.vendor_vat_number.length ; i++ ) {
-        var mwstValue = extracted_data.vendor_vat_number[i].value;
-        var res = suppliers_loader.getSupplierForUid( mwstValue );
-        if ( res.posting_block == true ) {
-            continue;
-        }
-        if ( res != 0 ) {
-            // add vendor_id to extracted_data
-            extracted_data.vendor_id = [{
-                match: extracted_data.vendor_vat_number[i].match,
-                value: res.id,
-                position: 0
-            }];
-            extracted_data.vendor_name = [{
-                match: extracted_data.vendor_vat_number[i].match,
-                value: res.name1,
-                position: 0
-            }];
-            return extracted_data;
-        }
-    }
-
-    extracted_data.vendor_id = [{
-        match: '',
-        value: '',
-        position: 0
-    }];
-    extracted_data.vendor_name = [{
-        match: '',
-        value: '',
-        position: 0
-    }];
-    return extracted_data;
-}
-
-function keepTopFive (data) {
-    for (const p of Object.entries(data)) {
-        var key   = p[0];
-        var arr   = p[1];
-        data[key] = arr.slice(0,5);
-    }
-    return data;
 }
 
 function cleanup_extracted_data ( d ) {

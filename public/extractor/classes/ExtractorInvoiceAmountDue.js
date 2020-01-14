@@ -59,6 +59,7 @@ class ExtractorInvoiceAmountDue extends Extractor {
      */
     iterate_matches_cleanup( obj ) {
         var arr = super.iterate_matches_cleanup( obj );
+        // sort by highest value descending
         arr = arr.sort( function( a, b ) {
             return parseFloat( b.value ) - parseFloat( a.value );
         } );

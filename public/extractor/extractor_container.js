@@ -2,9 +2,14 @@
 const {
     ipcRenderer
 } = require( 'electron' );
-const validators = require( '../extractor/validators.js' );
 const settings = require( './../../settings.json' );
 const sidebar_config = require( '../extractor/chde_invoice.json' );
+const suppliers_loader = require('../extractor/suppliers_loader.js');
+
+// load suppliers
+suppliers_loader.loadSuppliers( settings[ 'suppliers_csv_path' ], function () {
+    console.log('loadSuppliers finished');
+});
 
 // Model variables
 var pdf_queue = [];
@@ -197,27 +202,6 @@ function exportPDFData() {
     }
 }
 
-function loadJSONData() {
-    var url = new URL( window.location.href );
-    var path = url.searchParams.get( "file" );
-    path = path.slice( 0, -4 );
-    path = path + '.txt';
-    // load JSON for PDF file
-    fetch( path )
-        .then( response => {
-            return response.json()
-        } )
-        .then( data => {
-            // Work with JSON data here
-            delete data.seiten;
-            fillExtractorSidebar( data );
-        } )
-        .catch( err => {
-            // Do something for an error here
-            console.error( 'ERROR loading JSON' );
-        } )
-}
-
 function removeInputsFromExtractorContainer() {
     var extractorContainer = document.getElementById( 'extracted_data' );
     // remove all childnodes
@@ -294,7 +278,7 @@ function addInputDiv( name, json, key, validateFunc ) {
 
     var input_validation = function( e ) {
         if ( validateFunc ) {
-            var rv = validateFunc( e.target.value );
+            var rv = validateFunc( e.target.value, suppliers_loader );
             e.target.value = rv.output;
             if ( rv.valid === false ) {
                 e.target.classList.remove( 'valid' );

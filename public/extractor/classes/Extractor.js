@@ -34,7 +34,7 @@ class Extractor {
      * @returns {Object} rv
      */
     extractRegex( str ) {
-        // NEEDS TO BE OVERRIDDEN IN SUBCLASS
+        // NEEDS TO BE OVERWRITTEN IN SUBCLASS
     }
 
     /**

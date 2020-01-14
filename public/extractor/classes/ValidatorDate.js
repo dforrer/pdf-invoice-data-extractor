@@ -1,5 +1,5 @@
 // Requirements
-const util = require( './util.js' );
+const util = require( '../util.js' );
 
 /**
  * Validates a date string and returns a JS-object

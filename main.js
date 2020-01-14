@@ -77,11 +77,12 @@ Queue.prototype.size = function() {
 // Requirements
 const PDFExtract    = require('pdf.js-extract').PDFExtract;
 const pdfExtract    = new PDFExtract();
-const parser        = require('./parser.js');
 const exec          = require("child_process").exec;
 const fs            = require('fs');
 const js2xmlparser  = require("js2xmlparser");
-const settings      = require('./settings.json')
+
+const settings      = require('./settings.json');
+const parser        = require('./parser.js');
 
 // Constants
 const OCRMYPDF      = settings[ 'ocrmypdf' ];

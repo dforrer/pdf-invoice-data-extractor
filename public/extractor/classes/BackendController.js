@@ -11,7 +11,7 @@ const parser = require( './../../../parser.js' );
  *
  * @class
  */
-class BackgroundAppController {
+class BackendController {
 
     constructor( ipcMain ) {
         this.ipcMain = ipcMain;
@@ -116,4 +116,4 @@ class BackgroundAppController {
     }
 }
 
-module.exports = BackgroundAppController;
+module.exports = BackendController;

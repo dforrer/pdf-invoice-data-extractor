@@ -25,14 +25,13 @@ function parseJsonAndExport ( data, cb ) {
 
 // Helper function
 function parseJSON( data ) {
+    var out = '';
     try {
         var pages = data.pages;
     } catch ( err ) {
-        console.log('ERROR: Input file could not be parsed. Process exit.');
-        process.exit(1);
+        console.log('ERROR: Input file could not be parsed. Could not parse pages.');
+        return out;
     }
-    var out = '';
-    // iterate over all lists
     for ( var p = 0 ; p < pages.length ; p++ ) {
         out += '\n---------- ' + (p+1) + ' ----------\n'
         var content = pages[p].content;
@@ -51,7 +50,6 @@ function parseJSON( data ) {
     out = out.replace(/ı/g, 'i');
     // ignore lines with a length smaller than 2
     out = cleanup(out);
-
     return out;
 }
 

@@ -218,7 +218,9 @@ function collectExtractorContainerData() {
     var validated_data = {};
     for ( var i = 0; i < sidebar_config.extractor_container_fields.length; i++ ) {
         var f = sidebar_config.extractor_container_fields[ i ];
-        validated_data[ f.field ] = getInputValue( f.field );
+        if ( f.display_name != null ) {
+            validated_data[ f.field ] = getInputValue( f.field );
+        }
     }
     return validated_data;
 }

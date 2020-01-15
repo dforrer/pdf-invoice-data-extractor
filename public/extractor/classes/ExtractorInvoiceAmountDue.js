@@ -5,7 +5,7 @@ var Extractor = require( './Extractor.js' );
  * Extracts the invoice amount due from the pdf text
  * Note:
  * - invoice_esr_amount should be extracted first
- *   (see iterate_matches_cleanup)
+ *   (see iterateMatchesCleanup)
  * @class
  */
 class ExtractorInvoiceAmountDue extends Extractor {
@@ -57,8 +57,8 @@ class ExtractorInvoiceAmountDue extends Extractor {
      * @returns {Array} arr
      * @private
      */
-    iterate_matches_cleanup( obj ) {
-        var arr = super.iterate_matches_cleanup( obj );
+    iterateMatchesCleanup( obj ) {
+        var arr = super.iterateMatchesCleanup( obj );
         // sort by highest value descending
         arr = arr.sort( function( a, b ) {
             return parseFloat( b.value ) - parseFloat( a.value );

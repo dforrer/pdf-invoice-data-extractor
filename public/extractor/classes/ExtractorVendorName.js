@@ -5,7 +5,7 @@ var Extractor = require( './Extractor.js' );
  * Extracts the vendor name from the extracted_data JSON-Object
  * Note:
  * - vendor_iban, vendor_vat_number should be extracted first
- *   (see iterate_matches_cleanup)
+ *   (see iterateMatchesCleanup)
  * @class
  */
 class ExtractorVendorName extends Extractor {

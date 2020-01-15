@@ -46,8 +46,8 @@ class ExtractorInvoiceCurrency extends Extractor {
      * @returns {Array} arr
      * @private
      */
-    iterate_matches_cleanup( obj ) {
-        var arr = super.iterate_matches_cleanup( obj );
+    iterateMatchesCleanup( obj ) {
+        var arr = super.iterateMatchesCleanup( obj );
         // set default value
         if ( arr.length === 0 ) {
             arr.push( {

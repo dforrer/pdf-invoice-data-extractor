@@ -25,7 +25,7 @@ class Extractor {
      */
     extract() {
         var matches = this.extractRegex( this.pdf_text );
-        var matches_clean = this.iterate_matches_cleanup( matches );
+        var matches_clean = this.iterateMatchesCleanup( matches );
         return matches_clean.slice( 0, 5 ); // keep only the top 5 matches
     }
 
@@ -42,7 +42,7 @@ class Extractor {
      * @returns {Array} arr
      * @private
      */
-    iterate_matches_cleanup( obj ) {
+    iterateMatchesCleanup( obj ) {
         var arr = [];
         for ( const p of Object.entries( obj ) ) {
             var key = p[ 0 ];

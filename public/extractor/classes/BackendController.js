@@ -47,16 +47,14 @@ class BackendController {
      *
      */
     registerIpcEvents() {
-
         this.ipcMain.on( 'extract-data-from-pdf', ( event, arg ) => {
             //console.log( event );
             this.add( {
                 "event": event,
                 "pdf": arg
             } );
-            this.schedule_extract_job();
+            this.scheduleExtractJob();
         } );
-
         this.ipcMain.on( 'export-pdf-data', ( event, arg ) => {
             var formattedData = undefined;
             if ( settings[ 'export_format' ] === 'json' ) {
@@ -74,45 +72,37 @@ class BackendController {
     /*
      *
      */
-    schedule_extract_job() {
+    async scheduleExtractJob() {
         if ( this.size() == 0 || this.running_jobs_count > 1 ) {
             return;
         }
         this.running_jobs_count += 1;
-        var nextEl = this.last();
+        var next = this.last();
         this.remove();
-        this.extract_pdf( nextEl );
-    }
-
-    /*
-     *
-     */
-    extract_pdf( nextEl ) {
-        var self = this;
         const options = {};
-        pdfExtract.extract( nextEl.pdf.filepath, options, ( err, data ) => {
-            if ( err ) return console.log( err );
-            if ( settings[ 'debug' ] ) {
-                // write file to disk
-                fs.writeFile( nextEl.pdf.filepath + '_DEBUG.json', JSON.stringify( data ), 'utf8', ( err ) => {
-                    if ( err ) throw err;
-                } );
-            }
-            parser.parseJsonAndExport( data,
-                function( pdf_text, extracted_data ) {
-                    nextEl.pdf.extracted_data = extracted_data;
-                    nextEl.event.reply( 'data-extraction-done', nextEl.pdf );
-                    self.running_jobs_count -= 1;
-                    self.schedule_extract_job();
-                    if ( settings[ 'debug' ] ) {
-                        // write file to disk
-                        fs.writeFile( nextEl.pdf.filepath + '_DEBUG.txt', pdf_text, 'utf8', ( err ) => {
-                            if ( err ) throw err;
-                        } );
-                    }
-                }
-            );
-        } );
+        let pdf_content_json;
+        try {
+            pdf_content_json = await pdfExtract.extract( next.pdf.filepath, options );
+        } catch ( err ) {
+            console.log( err );
+        }
+        const {
+            pdf_text,
+            extracted_data
+        } = parser.parseJsonAndExport( pdf_content_json );
+        if ( settings[ 'debug' ] ) {
+            // write file to disk
+            fs.writeFile( next.pdf.filepath + '_DEBUG.json', JSON.stringify( pdf_content_json ), 'utf8', ( err ) => {
+                if ( err ) throw err;
+            } );
+            fs.writeFile( next.pdf.filepath + '_DEBUG.txt', pdf_text, 'utf8', ( err ) => {
+                if ( err ) throw err;
+            } );
+        }
+        next.pdf.extracted_data = extracted_data;
+        next.event.reply( 'data-extraction-done', next.pdf );
+        this.running_jobs_count -= 1;
+        this.scheduleExtractJob();
     }
 }
 

@@ -8,13 +8,13 @@ const sidebar_config = require( settings.sidebar_config );
 
 // Main function
 function parseJsonAndExport( data ) {
-    var pdf_text = parseJSON( data );
-    var extracted_data = {};
-    for ( var i = 0; i < sidebar_config.extractor_container_fields.length; i++ ) {
-        var f = sidebar_config.extractor_container_fields[ i ];
+    let pdf_text = parseJSON( data );
+    let extracted_data = {};
+    for ( let i = 0; i < sidebar_config.extractor_container_fields.length; i++ ) {
+        let f = sidebar_config.extractor_container_fields[ i ];
         try {
-            var ExtractorClass = require( './public/extractor/classes/' + f.extractor_class + '.js' );
-            var extractorClass = new ExtractorClass( pdf_text, extracted_data, suppliers_loader );
+            let ExtractorClass = require( './public/extractor/classes/' + f.extractor_class + '.js' );
+            let extractorClass = new ExtractorClass( pdf_text, extracted_data, suppliers_loader );
             extracted_data[ f.field ] = extractorClass.extract();
         } catch ( e ) {
             extracted_data[ f.field ] = [];
@@ -28,32 +28,31 @@ function parseJsonAndExport( data ) {
 
 // Helper function
 function parseJSON( data ) {
-    var out = '';
+    let rv = '';
+    let pages;
     try {
-        var pages = data.pages;
+        pages = data.pages;
     } catch ( err ) {
         console.log( 'ERROR: Input file could not be parsed. Could not parse pages.' );
-        return out;
+        return rv;
     }
-    for ( var p = 0; p < pages.length; p++ ) {
-        out += '\n---------- ' + ( p + 1 ) + ' ----------\n'
-        var content = pages[ p ].content;
+    for ( let p = 0; p < pages.length; p++ ) {
+        rv += '\n---------- ' + ( p + 1 ) + ' ----------\n'
+        let content = pages[ p ].content;
         content = sortContent( content );
-        for ( var i = 0; i < content.length; i++ ) {
+        for ( let i = 0; i < content.length; i++ ) {
             if ( i == 0 ) {
-                out += pages[ 0 ].content[ 0 ].str;
+                rv += pages[ 0 ].content[ 0 ].str;
                 continue;
             }
-            var prevEl = content[ i - 1 ];
-            var thisEl = content[ i ];
-            out = appendText( out, prevEl, thisEl );
+            rv = appendText( rv, content[ i - 1 ], content[ i ] );
         }
     }
     // replace dotless ı with i
-    out = out.replace( /ı/g, 'i' );
+    rv = rv.replace( /ı/g, 'i' );
     // ignore lines with a length smaller than 2
-    out = cleanup( out );
-    return out;
+    rv = cleanup( rv );
+    return rv;
 }
 
 // Helper function
@@ -86,17 +85,14 @@ function appendText( text, prevEl, newEl ) {
 
 // Helper function
 function cleanup( text ) {
-    var out = "";
-    var lines = text.split( "\n" );
-    for ( var i = 0; i < lines.length; i++ ) {
-        var lineVal = lines[ i ].trim();
-        lineVal = lineVal.replace( /\s{2,}/g, ' ' );
-        var lineLength = lineVal.length;
-        //if ( lineLength > 2 ) {
-        out += lineVal + '\n';
-        //}
+    let rv = '';
+    let lines = text.split( '\n' );
+    for ( let i = 0; i < lines.length; i++ ) {
+        let line = lines[ i ].trim();
+        line = line.replace( /\s{2,}/g, ' ' );
+        rv += line + '\n';
     }
-    return out;
+    return rv;
 }
 
 // Node.js module exports

@@ -5,7 +5,7 @@ const fs = require( 'fs' );
 const js2xmlparser = require( "js2xmlparser" );
 // Local requirements
 const settings = require( './../../../settings.json' );
-const parser = require( './../../../parser.js' );
+const PdfExtractJob = require( './PdfExtractJob.js' );
 
 /**
  *
@@ -70,7 +70,7 @@ class BackendController {
     }
 
     /*
-     *
+     * Async function
      */
     async scheduleExtractJob() {
         if ( this.size() == 0 || this.running_jobs_count > 1 ) {
@@ -79,25 +79,12 @@ class BackendController {
         this.running_jobs_count += 1;
         var next = this.last();
         this.remove();
-        const options = {};
-        let pdf_content_json;
+        let pdfExtractJob = new PdfExtractJob( next.pdf.filepath );
+        let extracted_data = {};
         try {
-            pdf_content_json = await pdfExtract.extract( next.pdf.filepath, options );
+            extracted_data = await pdfExtractJob.startJob();
         } catch ( err ) {
             console.log( err );
-        }
-        const {
-            pdf_text,
-            extracted_data
-        } = parser.parseJsonAndExport( pdf_content_json );
-        if ( settings[ 'debug' ] ) {
-            // write file to disk
-            fs.writeFile( next.pdf.filepath + '_DEBUG.json', JSON.stringify( pdf_content_json ), 'utf8', ( err ) => {
-                if ( err ) throw err;
-            } );
-            fs.writeFile( next.pdf.filepath + '_DEBUG.txt', pdf_text, 'utf8', ( err ) => {
-                if ( err ) throw err;
-            } );
         }
         next.pdf.extracted_data = extracted_data;
         next.event.reply( 'data-extraction-done', next.pdf );

@@ -24,7 +24,7 @@ var previousTarget = null;
 var focusedInput = null;
 
 // Model object declarations
-function PDF( filepath, extracted_data ) {
+function Pdf( filepath, extracted_data ) {
     this.filepath = filepath;
     this.extracted_data = extracted_data;
 }
@@ -35,9 +35,9 @@ function PDF( filepath, extracted_data ) {
 // Register keyboard shortcuts
 window.addEventListener( 'keyup', function( e ) {
     if ( e.ctrlKey && e.key.toLowerCase() === "n" ) {
-        nextPDF( 1 );
+        nextPdf( 1 );
     } else if ( e.ctrlKey && e.key.toLowerCase() === "b" ) {
-        nextPDF( -1 );
+        nextPdf( -1 );
     }
 } );
 
@@ -121,13 +121,13 @@ function registerMouseEvents() {
 function setupIPC() {
     // In renderer process (web page).
     ipcRenderer.on( 'data-extraction-done', ( event, arg ) => {
-        var newPDF = new PDF( arg.filepath, arg.extracted_data );
-        delete newPDF.extracted_data.seiten;
-        pdf_queue.push( newPDF );
-        updateButtonLoadNextPDF();
+        var newPdf = new Pdf( arg.filepath, arg.extracted_data );
+        delete newPdf.extracted_data.seiten;
+        pdf_queue.push( newPdf );
+        updateButtonLoadNextPdf();
         if ( PDFViewerApplication.pdfDocument == null ) {
             pdf_queue_index = -1;
-            nextPDF( 1 );
+            nextPdf( 1 );
         }
     } );
 }
@@ -143,8 +143,8 @@ function registerDropAreaEvent() {
 
         for ( const f of e.dataTransfer.files ) {
             console.log( 'File(s) you dragged here: ', f.path )
-            var newPDF = new PDF( f.path, undefined );
-            ipcRenderer.send( 'extract-data-from-pdf', newPDF );
+            var newPdf = new Pdf( f.path, undefined );
+            ipcRenderer.send( 'extract-data-from-pdf', newPdf );
         }
     } );
     document.getElementById( 'pdf_drop_area' ).addEventListener( 'dragover', ( e ) => {
@@ -153,7 +153,7 @@ function registerDropAreaEvent() {
     } );
 }
 
-function nextPDF( plusMinusOne ) {
+function nextPdf( plusMinusOne ) {
     unregisterMouseEvents();
     removeSpanEventListener();
     PDFViewerApplication.close();
@@ -170,19 +170,19 @@ function nextPDF( plusMinusOne ) {
         registerMouseEvents();
         setFocusToInput( 'input_invoice_type' );
     }
-    updateButtonLoadNextPDF();
+    updateButtonLoadNextPdf();
 }
 
-function deletePDFFromQueue() {
-    console.log( 'deletePDFFromQueue called' );
+function deletePdfFromQueue() {
+    console.log( 'deletePdfFromQueue called' );
     pdf_queue.splice( pdf_queue_index, 1 );
     if ( pdf_queue_index >= 1 ) {
         pdf_queue_index -= 1;
     }
-    nextPDF( -1 );
+    nextPdf( -1 );
 }
 
-function updateButtonLoadNextPDF() {
+function updateButtonLoadNextPdf() {
     var el = document.getElementById( 'current_pdf' );
     if ( pdf_queue.length > 0 ) {
         el.innerHTML = ( pdf_queue_index + 1 ) + "/" + pdf_queue.length;
@@ -191,14 +191,14 @@ function updateButtonLoadNextPDF() {
     }
 }
 
-function exportPDFData() {
-    console.log( 'exportPDFData called' );
+function exportPdfData() {
+    console.log( 'exportPdfData called' );
     if ( pdf_queue.length > 0 ) {
         var pdf = pdf_queue[ pdf_queue_index ];
         pdf.validated_data = collectExtractorContainerData();
         ipcRenderer.send( 'export-pdf-data', pdf );
-        // TODO implement exportPDFData
-        deletePDFFromQueue();
+        // TODO implement exportPdfData
+        deletePdfFromQueue();
     }
 }
 
@@ -271,7 +271,7 @@ function addInputDiv( name, json, key, validateFunc ) {
     if ( match ) {
         input.value = match.value;
         input.ondblclick = function() {
-            searchPDF( match.match );
+            searchPdf( match.match );
         }
     }
     input.addEventListener( 'focus', function( e ) {
@@ -314,7 +314,7 @@ function addInputDiv( name, json, key, validateFunc ) {
 /*
  * Triggers the "findagain" search event from viewer.js
  */
-function searchPDF( searchText ) {
+function searchPdf( searchText ) {
     PDFViewerApplication.findController.executeCommand( 'findagain', {
         query: searchText,
         phraseSearch: true,

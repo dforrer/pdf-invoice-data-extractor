@@ -1,6 +1,5 @@
 {
     "debug": false,
-    "ocrmypdf": false,
     "export_format": "xml",
     "suppliers_csv_path": "/Users/admin/Desktop/KREDBAN_2019_11_03.csv",
     "sidebar_config": "../chde_invoice.json"

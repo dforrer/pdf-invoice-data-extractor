@@ -4,7 +4,7 @@ const js2xmlparser = require( "js2xmlparser" );
 // Local requirements
 const settings = require( './../../../settings.json' );
 const PdfExtractJob = require( './PdfExtractJob.js' );
-const suppliers_loader = require( '../suppliers_loader.js' );
+const SuppliersLoader = require( './SuppliersLoader.js' );
 
 /**
  *
@@ -16,7 +16,8 @@ class BackendController {
         this.ipcMain = ipcMain;
         this.running_jobs_count = 0;
         this.pdf_queue = [];
-        this.suppliers_loader = suppliers_loader.loadSuppliers( settings[ 'suppliers_csv_path' ], function() {
+        this.suppliers_loader = new SuppliersLoader();
+        this.suppliers_loader.loadFromCsv( settings[ 'suppliers_csv_path' ], function() {
             console.log( 'loadSuppliers finished' );
         } );
     }
@@ -58,7 +59,7 @@ class BackendController {
             this.scheduleExtractJob();
         } );
         this.ipcMain.on( 'export-pdf-data', ( event, arg ) => {
-            var formattedData = undefined;
+            let formattedData = undefined;
             if ( settings[ 'export_format' ] === 'json' ) {
                 formattedData = JSON.stringify( arg.validated_data );
             } else {
@@ -79,7 +80,7 @@ class BackendController {
             return;
         }
         this.running_jobs_count += 1;
-        var next = this.last();
+        let next = this.last();
         this.remove();
         let pdfExtractJob = new PdfExtractJob( next.pdf.filepath, this.suppliers_loader );
         let extracted_data = {};

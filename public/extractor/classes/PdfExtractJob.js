@@ -10,8 +10,8 @@ const sidebar_config = require( settings.sidebar_config );
  * @class
  */
 class PdfExtractJob {
-    /*
-     *
+    /**
+     * @constructor
      */
     constructor( filepath, suppliers_loader ) {
         this.filepath = filepath;

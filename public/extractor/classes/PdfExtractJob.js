@@ -3,10 +3,6 @@ const PDFExtract = require( 'pdf.js-extract' ).PDFExtract;
 const pdfExtract = new PDFExtract();
 // Local requirements
 const settings = require( './../../../settings.json' );
-const suppliers_loader = require( '../suppliers_loader.js' );
-suppliers_loader.loadSuppliers( settings[ 'suppliers_csv_path' ], function() {
-    console.log( 'loadSuppliers finished' );
-} );
 const sidebar_config = require( settings.sidebar_config );
 
 /**
@@ -17,8 +13,9 @@ class PdfExtractJob {
     /*
      *
      */
-    constructor( filepath ) {
+    constructor( filepath, suppliers_loader ) {
         this.filepath = filepath;
+        this.suppliers_loader = suppliers_loader;
     }
 
     //====================
@@ -34,7 +31,7 @@ class PdfExtractJob {
             let f = sidebar_config.extractor_container_fields[ i ];
             try {
                 let ExtractorClass = require( './' + f.extractor_class + '.js' );
-                let extractorClass = new ExtractorClass( pdf_text, extracted_data, suppliers_loader );
+                let extractorClass = new ExtractorClass( pdf_text, extracted_data, this.suppliers_loader );
                 extracted_data[ f.field ] = extractorClass.extract();
             } catch ( e ) {
                 extracted_data[ f.field ] = [];

@@ -1,11 +1,10 @@
 // Requirements
-const PDFExtract = require( 'pdf.js-extract' ).PDFExtract;
-const pdfExtract = new PDFExtract();
 const fs = require( 'fs' );
 const js2xmlparser = require( "js2xmlparser" );
 // Local requirements
 const settings = require( './../../../settings.json' );
 const PdfExtractJob = require( './PdfExtractJob.js' );
+const suppliers_loader = require( '../suppliers_loader.js' );
 
 /**
  *
@@ -17,6 +16,9 @@ class BackendController {
         this.ipcMain = ipcMain;
         this.running_jobs_count = 0;
         this.pdf_queue = [];
+        this.suppliers_loader = suppliers_loader.loadSuppliers( settings[ 'suppliers_csv_path' ], function() {
+            console.log( 'loadSuppliers finished' );
+        } );
     }
 
     //====================
@@ -79,7 +81,7 @@ class BackendController {
         this.running_jobs_count += 1;
         var next = this.last();
         this.remove();
-        let pdfExtractJob = new PdfExtractJob( next.pdf.filepath );
+        let pdfExtractJob = new PdfExtractJob( next.pdf.filepath, this.suppliers_loader );
         let extracted_data = {};
         try {
             extracted_data = await pdfExtractJob.startJob();

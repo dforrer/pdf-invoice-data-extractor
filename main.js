@@ -80,6 +80,6 @@ makeSingleInstance();
 // code. You can also put them in separate files and require them here.
 //require('./app.js');
 
-let BackendController = require( './public/extractor/classes/BackendController.js' );
+let BackendController = require( './public/extractor/BackendController.js' );
 let backendController = new BackendController( ipcMain );
 backendController.registerIpcEvents();

@@ -3,13 +3,14 @@ const {
     ipcRenderer
 } = require( 'electron' );
 const settings = require( './../../settings.json' );
-const sidebar_config = require( '../extractor/chde_invoice.json' );
-const suppliers_loader = require('../extractor/suppliers_loader.js');
+const sidebar_config = require( '../../chde_invoice.json' );
+const SuppliersLoader = require( '../extractor/SuppliersLoader.js' );
 
 // load suppliers
-suppliers_loader.loadSuppliers( settings[ 'suppliers_csv_path' ], function () {
-    console.log('loadSuppliers finished');
-});
+const suppliers_loader = new SuppliersLoader();
+suppliers_loader.loadFromCsv( settings[ 'suppliers_csv_path' ], function() {
+    console.log( 'loadSuppliers finished' );
+} );
 
 // Model variables
 var pdf_queue = [];
@@ -153,10 +154,10 @@ function registerDropAreaEvent() {
     } );
 }
 
-function nextPdf( plusMinusOne ) {
+async function nextPdf( plusMinusOne ) {
     unregisterMouseEvents();
     removeSpanEventListener();
-    PDFViewerApplication.close();
+    await PDFViewerApplication.close();
     removeInputsFromExtractorContainer();
     if ( pdf_queue.length > 0 ) {
         pdf_queue_index += plusMinusOne;
@@ -165,7 +166,7 @@ function nextPdf( plusMinusOne ) {
         }
         pdf_queue_index = pdf_queue_index % pdf_queue.length;
         var next_pdf = pdf_queue[ pdf_queue_index ];
-        PDFViewerApplication.open( next_pdf.filepath );
+        await PDFViewerApplication.open( next_pdf.filepath );
         fillExtractorSidebar( next_pdf.extracted_data );
         registerMouseEvents();
         setFocusToInput( 'input_invoice_type' );
@@ -173,13 +174,13 @@ function nextPdf( plusMinusOne ) {
     updateButtonLoadNextPdf();
 }
 
-function deletePdfFromQueue() {
+async function deletePdfFromQueue() {
     console.log( 'deletePdfFromQueue called' );
     pdf_queue.splice( pdf_queue_index, 1 );
     if ( pdf_queue_index >= 1 ) {
         pdf_queue_index -= 1;
     }
-    nextPdf( -1 );
+    await nextPdf( -1 );
 }
 
 function updateButtonLoadNextPdf() {
@@ -238,7 +239,7 @@ function fillExtractorSidebar( json ) {
         var f = sidebar_fields[ i ];
         if ( f.display_name != null ) {
             try {
-                var ValidatorClass = require( '../extractor/classes/' + f.validator_class + '.js' );
+                var ValidatorClass = require( '../extractor/' + f.validator_class + '.js' );
                 addInputDiv( f.display_name, json, f.field, new ValidatorClass().validate );
             } catch ( e ) {
                 addInputDiv( f.display_name, json, f.field );
@@ -314,8 +315,8 @@ function addInputDiv( name, json, key, validateFunc ) {
 /*
  * Triggers the "findagain" search event from viewer.js
  */
-function searchPdf( searchText ) {
-    PDFViewerApplication.findController.executeCommand( 'findagain', {
+async function searchPdf( searchText ) {
+    await PDFViewerApplication.findController.executeCommand( 'findagain', {
         query: searchText,
         phraseSearch: true,
         caseSensitive: false,

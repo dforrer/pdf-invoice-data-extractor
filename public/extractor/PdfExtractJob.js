@@ -2,7 +2,7 @@
 const PDFExtract = require( 'pdf.js-extract' ).PDFExtract;
 const pdfExtract = new PDFExtract();
 // Local requirements
-const settings = require( './../../../settings.json' );
+const settings = require( './../../settings.json' );
 const sidebar_config = require( settings.sidebar_config );
 
 /**

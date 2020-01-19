@@ -15,6 +15,7 @@ suppliers_loader.loadFromCsv( settings[ 'suppliers_csv_path' ], function() {
 // Model variables
 var pdf_queue = [];
 var pdf_queue_index = 0;
+var pdf_loaded = false;
 
 // GUI variables
 var viewer = null; // div 'viewer' reference from PDFViewerApplication
@@ -126,7 +127,8 @@ function setupIPC() {
         delete newPdf.extracted_data.seiten;
         pdf_queue.push( newPdf );
         updateButtonLoadNextPdf();
-        if ( PDFViewerApplication.pdfDocument == null ) {
+        if ( !pdf_loaded ) {
+            pdf_loaded = true;
             pdf_queue_index = -1;
             nextPdf( 1 );
         }
@@ -157,6 +159,7 @@ function registerDropAreaEvent() {
 async function nextPdf( plusMinusOne ) {
     unregisterMouseEvents();
     removeSpanEventListener();
+    pdf_loaded = false;
     await PDFViewerApplication.close();
     removeInputsFromExtractorContainer();
     if ( pdf_queue.length > 0 ) {
@@ -166,6 +169,7 @@ async function nextPdf( plusMinusOne ) {
         }
         pdf_queue_index = pdf_queue_index % pdf_queue.length;
         var next_pdf = pdf_queue[ pdf_queue_index ];
+        pdf_loaded = true;
         await PDFViewerApplication.open( next_pdf.filepath );
         fillExtractorSidebar( next_pdf.extracted_data );
         registerMouseEvents();

@@ -3,7 +3,7 @@ const {
     ipcRenderer
 } = require( 'electron' );
 const settings = require( './../../settings.json' );
-const sidebar_config = require( '../../chde_invoice.json' );
+const sidebar_config = require( settings.sidebar_config );
 const SuppliersLoader = require( '../extractor/SuppliersLoader.js' );
 
 // load suppliers

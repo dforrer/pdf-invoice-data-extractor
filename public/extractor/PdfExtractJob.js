@@ -32,9 +32,9 @@ class PdfExtractJob {
             try {
                 let ExtractorClass = require( './' + f.extractor_class + '.js' );
                 let extractorClass = new ExtractorClass( pdf_text, extracted_data, this.suppliers_loader );
-                extracted_data[ f.field ] = extractorClass.extract();
+                extracted_data[ f.field_id ] = extractorClass.extract();
             } catch ( e ) {
-                extracted_data[ f.field ] = [];
+                extracted_data[ f.field_id ] = [];
             }
         }
         return extracted_data;

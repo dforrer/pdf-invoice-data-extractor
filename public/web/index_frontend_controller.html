@@ -36,7 +36,6 @@ See https://github.com/adobe-type-tools/cmap-resources
     <script src="../build/pdf.js"></script>
 
     <script src="viewer.js"></script>
-    <!--<script src="../extractor/extractor_container.js"></script>-->
     <script src="../extractor/FrontendController.js"></script>
   </head>
 
@@ -387,49 +386,33 @@ See https://github.com/adobe-type-tools/cmap-resources
       </div>  <!-- overlayContainer -->
 
     </div> <!-- outerContainer -->
-    <div id="extractorContainer">
-      <div id="extracted_data">
-      </div>
-      <a class="button6" href="#" onclick="frontendController.exportPdfData();">
-          Export
-      </a>
-      <a id="load_prev_pdf" class="button6 button9" href="#" onclick="frontendController.nextPdf(-1);">
-          <
-      </a>
-      <a id="current_pdf" class="button6 button10" href="#" onclick="frontendController.nextPdf(0);">
-          0/0
-      </a>
-      <a id="load_next_pdf" class="button6 button7" href="#" onclick="frontendController.nextPdf(1);">
-          >
-      </a>
-      <a id="delete_pdf" class="button6 button7 button8" href="#" onclick="frontendController.deletePdfFromQueue();">
-          Löschen
-      </a>
-      <div id="pdf_drop_area">
-        PDFs hier hinziehen
-      </div>
-      <script>
-        let frontendController = new FrontendController();
-        frontendController.registerDropAreaEvent();
-        frontendController.setupIPC();
-        frontendController.registerKeyboardHandler();
-
-        function waitForElement() {
-            console.log("Waiting for element");
-            try {
-                // try registering a callback on the PDFViewerApplication eventbus
-                PDFViewerApplication.pdfViewer.eventBus.on( 'textlayerrendered', frontendController.registerSpanOnMouseOver );
-            } catch ( e ) {
-                setTimeout( waitForElement, 250 );
-            }
-        }
-
-        waitForElement();
-/*        registerDropAreaEvent();
-        setupIPC();
-*/
-      </script>
-    </div>
     <div id="printContainer"></div>
+    <div id="extractorContainer">
+      <div id="extracted_data"></div>
+      <a id="export_pdf_data" class="button6" href="#" onclick="frontendController.exportPdfData();">Export</a>
+      <a id="load_prev_pdf" class="button6 button9" href="#" onclick="frontendController.nextPdf(-1);"><</a>
+      <a id="current_pdf" class="button6 button10" href="#" onclick="frontendController.nextPdf(0);">0/0</a>
+      <a id="load_next_pdf" class="button6 button7" href="#" onclick="frontendController.nextPdf(1);">></a>
+      <a id="delete_pdf" class="button6 button7 button8" href="#" onclick="frontendController.deletePdfFromQueue();">Löschen</a>
+      <div id="pdf_drop_area">PDFs hier hinziehen</div>
+    </div>
+    <script>
+      let frontendController = new FrontendController();
+      frontendController.registerDropAreaEvent();
+      frontendController.setupIPC();
+      frontendController.registerKeyboardHandler();
+
+      function waitForElement() {
+          console.log("Waiting for element");
+          try {
+              // try registering a callback on the PDFViewerApplication eventbus
+              PDFViewerApplication.pdfViewer.eventBus.on( 'textlayerrendered', frontendController.registerSpanOnMouseOver );
+          } catch ( e ) {
+              setTimeout( waitForElement, 250 );
+          }
+      }
+
+      waitForElement();
+    </script>
   </body>
 </html>

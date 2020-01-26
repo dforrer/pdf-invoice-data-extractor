@@ -22,7 +22,7 @@ function createWindow () {
     })
 
     // and load the index.html of the app.
-    mainWindow.loadFile('public/web/index.html')
+    mainWindow.loadFile('public/web/index_frontend_controller.html')
 
     // Open the DevTools.
     // mainWindow.webContents.openDevTools()

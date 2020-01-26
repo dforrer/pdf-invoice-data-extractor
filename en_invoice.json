@@ -4,70 +4,70 @@
     "version": "0.1",
     "extractor_container_fields": [
         {
-            "field": "invoice_type",
+            "field_id": "invoice_type",
             "display_name": "Invoice type",
             "display_position": 0,
             "extractor_class": "ExtractorInvoiceType",
             "validator_class": "ValidatorInvoiceType"
         },
         {
-            "field": "invoice_number",
+            "field_id": "invoice_number",
             "display_name": "Invoice number",
             "display_position": 3,
             "extractor_class": "ExtractorInvoiceNumber",
             "validator_class": "ValidatorInvoiceNumber"
         },
         {
-            "field": "invoice_date",
+            "field_id": "invoice_date",
             "display_name": "Invoice date",
             "display_position": 4,
             "extractor_class": "ExtractorInvoiceDate",
             "validator_class": "ValidatorDate"
         },
         {
-            "field": "invoice_currency",
+            "field_id": "invoice_currency",
             "display_name": "Currency",
             "display_position": 5,
             "extractor_class": "ExtractorInvoiceCurrency",
             "validator_class": "ValidatorInvoiceCurrency"
         },
         {
-            "field": "invoice_amount_due",
+            "field_id": "invoice_amount_due",
             "display_name": "Total Amount",
             "display_position": 6,
             "extractor_class": "ExtractorInvoiceAmountDue",
             "validator_class": "ValidatorAmount"
         },
         {
-            "field": "vendor_iban",
+            "field_id": "vendor_iban",
             "display_name": "IBAN",
             "display_position": 11,
             "extractor_class": "ExtractorVendorIban",
             "validator_class": null
         },
         {
-            "field": "vendor_email",
+            "field_id": "vendor_email",
             "display_name": "Email",
             "display_position": 12,
             "extractor_class": "ExtractorVendorEmail",
             "validator_class": null
         },
         {
-            "field": "vendor_phone",
+            "field_id": "vendor_phone",
             "display_name": "Phone",
             "display_position": 13,
             "extractor_class": "ExtractorVendorPhone",
             "validator_class": null
         },
         {
-            "field": "vendor_id",
+            "field_id": "vendor_id",
             "display_name": "Vendor ID",
             "display_position": 1,
             "extractor_class": "ExtractorVendorId",
             "validator_class": "ValidatorVendorId"
         },
         {
-            "field": "vendor_name",
+            "field_id": "vendor_name",
             "display_name": "Vendor name",
             "display_position": 2,
             "extractor_class": "ExtractorVendorName",

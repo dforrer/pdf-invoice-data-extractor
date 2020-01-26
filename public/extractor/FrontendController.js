@@ -36,6 +36,7 @@ class Pdf {
 class FrontendController {
 
     constructor() {
+        this.pdf_loaded = false;
         this.settings = settings;
         this.suppliers_loader = new SuppliersLoader();
         this.suppliers_loader.loadFromCsv( settings[ 'suppliers_csv_path' ], function() {
@@ -135,7 +136,7 @@ class FrontendController {
             delete newPdf.extracted_data.seiten;
             pdf_queue.push( newPdf );
             $this.sidebar.updateButtonLoadNextPdf();
-            if ( PDFViewerApplication.pdfDocument == null ) {
+            if ( $this.pdf_loaded == false ) {
                 pdf_queue_index = -1;
                 $this.nextPdf( 1 );
             }
@@ -162,6 +163,7 @@ class FrontendController {
     async nextPdf( plusMinusOne ) {
         this.unregisterMouseEvents();
         FrontendController.removeSpanEventListener();
+        this.pdf_loaded = false;
         await PDFViewerApplication.close();
         this.sidebar.clear();
         if ( pdf_queue.length > 0 ) {
@@ -171,6 +173,7 @@ class FrontendController {
             }
             pdf_queue_index = pdf_queue_index % pdf_queue.length;
             let next_pdf = pdf_queue[ pdf_queue_index ];
+            this.pdf_loaded = true;
             await PDFViewerApplication.open( next_pdf.filepath );
             this.sidebar.fill( next_pdf.extracted_data );
             this.registerMouseEvents();

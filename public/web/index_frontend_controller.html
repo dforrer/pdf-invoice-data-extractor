@@ -401,18 +401,6 @@ See https://github.com/adobe-type-tools/cmap-resources
       frontendController.registerDropAreaEvent();
       frontendController.setupIPC();
       frontendController.registerKeyboardHandler();
-
-      function waitForElement() {
-          console.log("Waiting for element");
-          try {
-              // try registering a callback on the PDFViewerApplication eventbus
-              PDFViewerApplication.pdfViewer.eventBus.on( 'textlayerrendered', frontendController.registerSpanOnMouseOver );
-          } catch ( e ) {
-              setTimeout( waitForElement, 250 );
-          }
-      }
-
-      waitForElement();
     </script>
   </body>
 </html>

@@ -45,6 +45,7 @@ class FrontendController {
         this.sidebar = new Sidebar( this );
         this.sidebar.addFieldsFromConfig();
         this.sidebar.renderSidebarFields();
+        FrontendController.waitForElement();
     }
 
     //====================
@@ -95,10 +96,20 @@ class FrontendController {
         }
     }
 
-    registerSpanOnMouseOver() {
+    static registerSpanOnMouseOver() {
         FrontendController.removeSpanEventListener();
         viewerSpans = Array.from( viewer.getElementsByTagName( 'span' ) );
         FrontendController.addSpanEventListener();
+    }
+
+    static waitForElement() {
+        console.log("Waiting for element");
+        try {
+            // try registering a callback on the PDFViewerApplication eventbus
+            PDFViewerApplication.pdfViewer.eventBus.on( 'textlayerrendered', FrontendController.registerSpanOnMouseOver );
+        } catch ( e ) {
+            setTimeout( FrontendController.waitForElement, 250 );
+        }
     }
 
     static mousedownHandlerViewer( e ) {

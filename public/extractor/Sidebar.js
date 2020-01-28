@@ -21,6 +21,15 @@ class Sidebar {
         } );
     }
 
+    setButtonTitles() {
+        let export_pdf_data = document.getElementById( 'export_pdf_data' );
+        let delete_pdf = document.getElementById( 'delete_pdf' );
+        let pdf_drop_area = document.getElementById( 'pdf_drop_area' );
+        export_pdf_data.innerHTML = this.sidebar_config.export_pdf_data_button;
+        delete_pdf.innerHTML = this.sidebar_config.delete_pdf_button;
+        pdf_drop_area.innerHTML = this.sidebar_config.pdf_drop_area;
+    }
+
     renderSidebarFields() {
         let extractorContainer = document.getElementById( 'extracted_data' );
         for ( let f of this.fields ) {

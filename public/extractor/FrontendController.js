@@ -45,6 +45,7 @@ class FrontendController {
         this.sidebar = new Sidebar( this );
         this.sidebar.addFieldsFromConfig();
         this.sidebar.renderSidebarFields();
+        this.sidebar.setButtonTitles();
         FrontendController.waitForElement();
     }
 

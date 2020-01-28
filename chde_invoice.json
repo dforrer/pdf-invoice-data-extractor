@@ -2,6 +2,9 @@
     "country_code": "CH",
     "language": "de",
     "version": "0.1",
+    "export_pdf_data_button":"Export",
+    "delete_pdf_button":"Löschen",
+    "pdf_drop_area":"PDF(s) hier hinziehen",
     "extractor_container_fields": [
         {
             "field_id": "invoice_type",

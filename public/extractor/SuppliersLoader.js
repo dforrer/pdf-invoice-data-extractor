@@ -12,16 +12,16 @@ class Supplier {
      * @param {object} attr - object containing the attributes of a single supplier
      */
     constructor( attr ) {
-        this.id = attr[ 'Kreditor' ];
+        this.id = attr[ 'Creditor' ];
         this.name1 = attr[ 'Name 1' ];
         this.name2 = attr[ 'Name 2' ];
-        this.street = attr[ 'Straße' ];
-        this.postcode = attr[ 'Postleitz.' ];
-        this.town = attr[ 'Ort' ];
-        this.country = attr[ 'Land' ];
+        this.street = attr[ 'Street' ];
+        this.postcode = attr[ 'Postcode' ];
+        this.town = attr[ 'Town' ];
+        this.country = attr[ 'Country' ];
         this.iban = attr[ 'IBAN' ];
-        this.vat_number = attr[ 'Steuernummer 1' ];
-        if ( attr[ 'Zentrale Buchungssperre' ] == 'nein' ) {
+        this.vat_number = attr[ 'Vat Number' ];
+        if ( attr[ 'Posting Block' ] == 'no' ) {
             this.posting_block = false;
         } else {
             this.posting_block = true;

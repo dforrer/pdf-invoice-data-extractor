@@ -20,7 +20,7 @@ class Supplier {
         this.town = attr[ 'Ort' ];
         this.country = attr[ 'Land' ];
         this.iban = attr[ 'IBAN' ];
-        this.uid = attr[ 'Steuernummer 1' ];
+        this.vat_number = attr[ 'Steuernummer 1' ];
         if ( attr[ 'Zentrale Buchungssperre' ] == 'nein' ) {
             this.posting_block = false;
         } else {
@@ -30,7 +30,7 @@ class Supplier {
 }
 
 class SuppliersLoader {
-    
+
     constructor() {
         this.suppliers = [];
     }
@@ -86,14 +86,14 @@ class SuppliersLoader {
     }
 
     /**
-     * Get function to retrieve single supplier from suppliers array based on UID
-     * @param {string} uid
+     * Get function to retrieve single supplier from suppliers array based on vat number
+     * @param {string} vat_number
      * @returns {Supplier}
      */
 
-    getSupplierForUid( uid ) {
+    getSupplierForVatNumber( vat_number ) {
         for ( let i = 0; i < this.suppliers.length; i++ ) {
-            if ( this.suppliers[ i ].uid == uid ) {
+            if ( this.suppliers[ i ].vat_number == vat_number ) {
                 return this.suppliers[ i ];
             }
         }

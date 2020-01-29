@@ -48,8 +48,8 @@ class ExtractorVendorName extends Extractor {
 
         // find supplier for vendor_vat_number
         for ( var i = 0; i < this.extracted_data.vendor_vat_number.length; i++ ) {
-            var mwstValue = this.extracted_data.vendor_vat_number[ i ].value;
-            var res = this.suppliers_loader.getSupplierForUid( mwstValue );
+            var vat_number = this.extracted_data.vendor_vat_number[ i ].value;
+            var res = this.suppliers_loader.getSupplierForVatNumber( vat_number );
             if ( res.posting_block == true ) {
                 continue;
             }

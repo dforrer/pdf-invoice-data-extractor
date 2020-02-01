@@ -11,6 +11,12 @@
 - Export format options: JSON, XML
 - Focus on scanned documents with a scan resolution of 300 dpi and black and white only.
 
+## Motivation
+
+- I needed a way to extract textual data from PDF documents specifically invoices.
+- All available solutions required the upload of the PDF documents to a webservice which was not an option.
+- Furthermore I required a solution to easily validate the extracted data with a GUI.
+
 ## Data extraction
 
 Regular expressions are used to extract the field values from a text only version of the PDF document.

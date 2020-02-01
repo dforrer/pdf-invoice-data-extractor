@@ -49,6 +49,13 @@
             "validator_class": null
         },
         {
+            "field_id": "vendor_vat_number",
+            "display_name": "VAT Number",
+            "display_position": 10,
+            "extractor_class": "ExtractorVendorVatNumber",
+            "validator_class": null
+        },
+        {
             "field_id": "vendor_email",
             "display_name": "Email",
             "display_position": 12,

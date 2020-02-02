@@ -1,6 +1,18 @@
 {
     "debug": false,
     "export_format": "xml",
+    "sidebar_config": "./../../chde_invoice.json",
     "suppliers_csv_path": "./test_data/creditors_list.csv",
-    "sidebar_config": "./../../chde_invoice.json"
+    "suppliers_csv_columns": {
+        "id": "Creditor",
+        "name1": "Name 1",
+        "name2": "Name 2",
+        "street": "Street",
+        "postcode": "Postcode",
+        "town": "Town",
+        "country": "Country",
+        "iban": "IBAN",
+        "vat_number": "Vat Number",
+        "posting_block": "Posting Block"
+    }
 }

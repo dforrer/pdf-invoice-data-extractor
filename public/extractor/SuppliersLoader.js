@@ -1,6 +1,7 @@
 // Requirements
 const fs = require( 'fs' );
 const readline = require( 'readline' );
+const settings = require( './../../settings.json' );
 
 /**
  * Constructs a Supplier-object
@@ -12,16 +13,18 @@ class Supplier {
      * @param {object} attr - object containing the attributes of a single supplier
      */
     constructor( attr ) {
-        this.id = attr[ 'Creditor' ];
-        this.name1 = attr[ 'Name 1' ];
-        this.name2 = attr[ 'Name 2' ];
-        this.street = attr[ 'Street' ];
-        this.postcode = attr[ 'Postcode' ];
-        this.town = attr[ 'Town' ];
-        this.country = attr[ 'Country' ];
-        this.iban = attr[ 'IBAN' ];
-        this.vat_number = attr[ 'Vat Number' ];
-        if ( attr[ 'Posting Block' ] == 'no' ) {
+        let csv_cols = settings.suppliers_csv_columns;
+        // assign CSV columns to Supplier attributes
+        this.id = attr[ csv_cols.id ];
+        this.name1 = attr[ csv_cols.name1 ];
+        this.name2 = attr[ csv_cols.name2 ];
+        this.street = attr[ csv_cols.street ];
+        this.postcode = attr[ csv_cols.postcode ];
+        this.town = attr[ csv_cols.town ];
+        this.country = attr[ csv_cols.country ];
+        this.iban = attr[ csv_cols.iban ];
+        this.vat_number = attr[ csv_cols.vat_number ];
+        if ( attr[ csv_cols.posting_block ] == 'no' ) {
             this.posting_block = false;
         } else {
             this.posting_block = true;

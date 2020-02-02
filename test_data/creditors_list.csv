@@ -1,4 +1,4 @@
 Creditor;Name 1;Name 2;Street;Postcode;Town;Country;IBAN;Vat Number;Posting Block
 1001;Eidg. Departement für auswärtige Angelegenheiten;Direktion für Ressourcen;;3003;Bern;CH;CH520023223228308701C;CHE433064977;no
-2002;Test creditor 2;;Hauptstrasse 33;70191;Stuttgart;DE;DE60600100700027380703;;no
-3003;Test creditor 3;;Seitengasse 12;6340;Baar;CH;CH4300292292122333280;CHE103587602;no
+2002;Test company 2;;Hauptstrasse 33;70191;Stuttgart;DE;DE60600100700027380703;;no
+3003;Test company 3;;Seitengasse 12;6340;Baar;CH;CH4300292292122333280;CHE103587602;no

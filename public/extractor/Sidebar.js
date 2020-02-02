@@ -30,6 +30,26 @@ class Sidebar {
         pdf_drop_area.innerHTML = this.sidebar_config.pdf_drop_area;
     }
 
+    registerLongPressHandler() {
+        const $this = this;
+        console.log( 'registerLongPressHandler' );
+        let delete_pdf = document.getElementById( 'delete_pdf' );
+        let pressTimer;
+        delete_pdf.addEventListener( 'mouseup', function( e ) {
+            clearTimeout( pressTimer );
+            return false;
+        } );
+        delete_pdf.addEventListener( 'mousedown', function( e ) {
+            pressTimer = window.setTimeout( function() {
+                console.log( 'Delete Button: long press' );
+                if ( confirm( 'Clear PDF queue?' ) ) {
+                    $this.frontendCntlr.clearPdfQueue();
+                }
+            }, 1000 );
+            return false;
+        } );
+    }
+
     renderSidebarFields() {
         let extractorContainer = document.getElementById( 'extracted_data' );
         for ( let f of this.fields ) {

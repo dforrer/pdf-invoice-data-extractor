@@ -46,6 +46,7 @@ class FrontendController {
         this.sidebar.addFieldsFromConfig();
         this.sidebar.renderSidebarFields();
         this.sidebar.setButtonTitles();
+        this.sidebar.registerLongPressHandler();
         FrontendController.waitForElement();
     }
 
@@ -104,7 +105,7 @@ class FrontendController {
     }
 
     static waitForElement() {
-        console.log("Waiting for element");
+        console.log( "Waiting for element" );
         try {
             // try registering a callback on the PDFViewerApplication eventbus
             PDFViewerApplication.pdfViewer.eventBus.on( 'textlayerrendered', FrontendController.registerSpanOnMouseOver );
@@ -189,7 +190,7 @@ class FrontendController {
             await PDFViewerApplication.open( next_pdf.filepath );
             this.sidebar.fill( next_pdf.extracted_data );
             this.registerMouseEvents();
-            this.sidebar.fields[0].input.focus(); // set focus to the first field in the sidebar
+            this.sidebar.fields[ 0 ].input.focus(); // set focus to the first field in the sidebar
         }
         this.sidebar.updateButtonLoadNextPdf();
     }
@@ -200,6 +201,11 @@ class FrontendController {
         if ( pdf_queue_index >= 1 ) {
             pdf_queue_index -= 1;
         }
+        await this.nextPdf( -1 );
+    }
+
+    async clearPdfQueue() {
+        pdf_queue = [];
         await this.nextPdf( -1 );
     }
 

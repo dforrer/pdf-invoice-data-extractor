@@ -9,7 +9,8 @@
 - Electron app with node.js backend
 - Vendor matching based on vat number (CHE-xxx.xxx.xxx), IBAN from separate CSV-list
 - Export format options: JSON, XML
-- Focus on scanned documents with a scan resolution of 300 dpi and black and white only.
+- Focus on scanned and OCR'd documents with a scan resolution of 300 dpi.
+- **NO OCR!** This software does not perform any OCR on the PDF documents. It merely extracts the existing text content.
 
 ## Screenshots
 
@@ -28,9 +29,10 @@ Regular expressions are used to extract the field values from a text only versio
 ## PDF extraction pipeline
 
 ```
-            scan                OCR            regex
-1 document ------> 1-N images -------> 1 text -------> 1-N key-value pairs
-                                                       (extracted_data)
+                extract text from
+                text layer in PDF           regex
+1 PDF document -------------------> 1 text -------> 1-N key-value pairs
+                                                     (extracted_data)
 
 ```
 
@@ -39,7 +41,7 @@ Regular expressions are used to extract the field values from a text only versio
 ```
                      user validation
 1-N key-value pairs ----------------> 1-N key-value pairs
-(extracted_data)                      (validated_data)
+ (extracted_data)                      (validated_data)
 
 ```
 

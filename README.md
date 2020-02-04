@@ -11,6 +11,10 @@
 - Export format options: JSON, XML
 - Focus on scanned documents with a scan resolution of 300 dpi and black and white only.
 
+## Screenshots
+
+![GUI](docs/screenshot_01.png?raw=true "GUI screenshot")
+
 ## Motivation
 
 - I needed a way to extract textual data from PDF documents specifically invoices.

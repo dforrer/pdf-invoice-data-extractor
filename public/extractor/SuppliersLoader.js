@@ -1,7 +1,7 @@
 // Requirements
 const fs = require( 'fs' );
 const readline = require( 'readline' );
-const settings = require( './../../settings.json' );
+const settings = require( './../../config/settings.json' );
 
 /**
  * Constructs a Supplier-object

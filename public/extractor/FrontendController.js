@@ -3,7 +3,7 @@ const {
     ipcRenderer
 } = require( 'electron' );
 // Local requirements
-const settings = require( './../../settings.json' );
+const settings = require( './../../config/settings.json' );
 
 const SuppliersLoader = require( '../extractor/SuppliersLoader.js' );
 const Sidebar = require( '../extractor/Sidebar.js' );

@@ -2,7 +2,7 @@
 const fs = require( 'fs' );
 const js2xmlparser = require( "js2xmlparser" );
 // Local requirements
-const settings = require( './../../settings.json' );
+const settings = require( './../../config/settings.json' );
 const PdfExtractJob = require( './PdfExtractJob.js' );
 const SuppliersLoader = require( './SuppliersLoader.js' );
 

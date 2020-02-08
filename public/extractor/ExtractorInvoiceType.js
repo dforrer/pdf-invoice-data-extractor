@@ -1,5 +1,5 @@
 // Requirements
-var Extractor = require( './Extractor.js' );
+let Extractor = require( './Extractor.js' );
 
 /**
  * Extracts the invoice date from the pdf text
@@ -19,7 +19,7 @@ class ExtractorInvoiceType extends Extractor {
      * @returns {Object} rv
      */
     extractRegex( str ) {
-        var pattern = /(?:\b(?:Ausgangs)?(R)(?:echnung))|(?:\b(R)(?:g\.\b))|(?:\b(R)g\b)|(?:\b(I)nvoice)|(?:\bFaktu(r)a)|(?:\bFactu(r)e)|(?:\b(G)utschrift)|(?:\b(C)redit note)|(?:\b(c)rédit)/gim;
+        let pattern = /(?:\b(?:Ausgangs)?(R)(?:echnung))|(?:\b(R)(?:g\.\b))|(?:\b(R)g\b)|(?:\b(I)nvoice)|(?:\bFaktu(r)a)|(?:\bFactu(r)e)|(?:\b(G)utschrift)|(?:\b(C)redit note)|(?:\b(c)rédit)/gim;
         return this.loopMatches( str, pattern );
     }
 
@@ -29,7 +29,7 @@ class ExtractorInvoiceType extends Extractor {
      * @returns {Object} r
      */
     cleanup( key, value ) {
-        var r = {};
+        let r = {};
         switch ( value.g1 ) {
             case "G":
             case "g":
@@ -56,7 +56,7 @@ class ExtractorInvoiceType extends Extractor {
      * @private
      */
     iterateMatchesCleanup( obj ) {
-        var arr = super.iterateMatchesCleanup( obj );
+        let arr = super.iterateMatchesCleanup( obj );
         // set default value
         if ( arr.length === 0 ) {
             arr.push( {

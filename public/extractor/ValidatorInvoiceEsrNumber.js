@@ -19,13 +19,13 @@ class ValidatorInvoiceEsrNumber {
      * @returns {object} rv
      */
     validate( str ) {
-        var rv = {
+        let rv = {
             input: str,
             valid: true,
             default: false
         };
-        var whitelist = '1234567890-';
-        var flags = 'gm';
+        let whitelist = '1234567890-';
+        let flags = 'gm';
         rv.output = util.removeChars( whitelist, str, flags );
         return rv;
     }

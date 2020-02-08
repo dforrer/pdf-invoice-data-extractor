@@ -24,8 +24,8 @@ class Extractor {
      * @public
      */
     extract() {
-        var matches = this.extractRegex( this.pdf_text );
-        var matches_clean = this.iterateMatchesCleanup( matches );
+        let matches = this.extractRegex( this.pdf_text );
+        let matches_clean = this.iterateMatchesCleanup( matches );
         return matches_clean.slice( 0, 5 ); // keep only the top 5 matches
     }
 
@@ -43,11 +43,11 @@ class Extractor {
      * @private
      */
     iterateMatchesCleanup( obj ) {
-        var arr = [];
+        let arr = [];
         for ( const p of Object.entries( obj ) ) {
-            var key = p[ 0 ];
-            var value = p[ 1 ];
-            var r = this.cleanup( key, value );
+            let key = p[ 0 ];
+            let value = p[ 1 ];
+            let r = this.cleanup( key, value );
             if ( r !== null ) {
                 arr.push( r );
             }
@@ -61,10 +61,10 @@ class Extractor {
      * @returns {Object} rv
      */
     loopMatches( str, pattern ) {
-        var rv = {};
+        let rv = {};
         let match = pattern.exec( str );
         while ( match != null ) {
-            var entry = {
+            let entry = {
                 i: match.index
             }; // index
             // remove undefined results from array
@@ -75,7 +75,7 @@ class Extractor {
             entry.g1 = match[ 1 ]; // group 1
             match[ 2 ] != undefined ? entry.g2 = match[ 2 ] : 1; // group 2
             match[ 3 ] != undefined ? entry.g3 = match[ 3 ] : 1; // group 3
-            var m = match[ 0 ].trim();
+            let m = match[ 0 ].trim();
             if ( !rv[ m ] ) {
                 // key doesn't exist yet
                 rv[ m ] = entry;

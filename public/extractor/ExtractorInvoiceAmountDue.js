@@ -1,5 +1,5 @@
 // Requirements
-var Extractor = require( './Extractor.js' );
+let Extractor = require( './Extractor.js' );
 
 /**
  * Extracts the invoice amount due from the pdf text
@@ -22,7 +22,7 @@ class ExtractorInvoiceAmountDue extends Extractor {
      * @returns {Object} rv
      */
     extractRegex( str ) {
-        var pattern = /(?:rechnungstotal|gesamtsumme|summe|amount|gesamtbetrag|total|invoicetotal|betrag|chf|sfr|fr\.|eur|usd|gbp|\$|€|brutto)(?:\s|\D){1,20}((?:\d{1,3}(?:\'|\’|\.|\,|\s)?)?(?:\d{1,3}(?:(?:\'|\.|\,|\ )?(?:\d{2}|-)?)))(?!%|\d)/gim;
+        let pattern = /(?:rechnungstotal|gesamtsumme|summe|amount|gesamtbetrag|total|invoicetotal|betrag|chf|sfr|fr\.|eur|usd|gbp|\$|€|brutto)(?:\s|\D){1,20}((?:\d{1,3}(?:\'|\’|\.|\,|\s)?)?(?:\d{1,3}(?:(?:\'|\.|\,|\ )?(?:\d{2}|-)?)))(?!%|\d)/gim;
         return this.loopMatches( str, pattern );
     }
 
@@ -32,7 +32,7 @@ class ExtractorInvoiceAmountDue extends Extractor {
      * @returns {Object} r
      */
     cleanup( key, value ) {
-        var r = {};
+        let r = {};
         // check if key contains keywords like datum, date, ...
         if ( /exk|innert (10|14|15|20|30)|liefer|zwischensumme/gi.test( key ) ) {
             return null;
@@ -58,7 +58,7 @@ class ExtractorInvoiceAmountDue extends Extractor {
      * @private
      */
     iterateMatchesCleanup( obj ) {
-        var arr = super.iterateMatchesCleanup( obj );
+        let arr = super.iterateMatchesCleanup( obj );
         // sort by highest value descending
         arr = arr.sort( function( a, b ) {
             return parseFloat( b.value ) - parseFloat( a.value );
@@ -68,8 +68,8 @@ class ExtractorInvoiceAmountDue extends Extractor {
             arr = [];
             // e.g. 0100005310005
             // cut off first 2 and last character of esr_amount
-            var esr_amount = this.extracted_data.invoice_esr_amount[ 0 ];
-            var esr_amount_float = parseFloat( esr_amount.value.substring( 2, 12 ) ) / 100;
+            let esr_amount = this.extracted_data.invoice_esr_amount[ 0 ];
+            let esr_amount_float = parseFloat( esr_amount.value.substring( 2, 12 ) ) / 100;
             arr.push( {
                 match: esr_amount.match,
                 position: esr_amount.position,

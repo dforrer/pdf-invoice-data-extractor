@@ -18,7 +18,7 @@ class ValidatorInvoiceCurrency {
      * @returns {object} rv
      */
     validate( str ) {
-        var rv = {
+        let rv = {
             input: str,
             valid: true,
             default: false

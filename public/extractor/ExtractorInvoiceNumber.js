@@ -1,5 +1,5 @@
 // Requirements
-var Extractor = require( './Extractor.js' );
+let Extractor = require( './Extractor.js' );
 
 /**
  * Extracts the invoice number from the pdf text
@@ -19,7 +19,7 @@ class ExtractorInvoiceNumber extends Extractor {
      * @returns {Object} rv
      */
     extractRegex( str ) {
-        var pattern = /(?:(?:rechnung|Rechn|faktura|Beleg|facture|invoice|Gutschrift|credit note)(?:\d|\D)?(?:\n)?(?:nummer|number|nr\.|Nr):?\s?(\d{2,16}))|(?:(?:Rechnung|Rechn|faktura|facture|invoice)(?:\D{1,16})?(\d+(?:\.|\'|-)?\d+))|(?:(?:Rechnung|faktura|facture|beleg|invoice|Gutschrift|credit note)(?:\D{1,16})?(?:\n)?(?:\D{1,6})?(?:\n)?(\d{2,16}))/gim;
+        let pattern = /(?:(?:rechnung|Rechn|faktura|Beleg|facture|invoice|Gutschrift|credit note)(?:\d|\D)?(?:\n)?(?:nummer|number|nr\.|Nr):?\s?(\d{2,16}))|(?:(?:Rechnung|Rechn|faktura|facture|invoice)(?:\D{1,16})?(\d+(?:\.|\'|-)?\d+))|(?:(?:Rechnung|faktura|facture|beleg|invoice|Gutschrift|credit note)(?:\D{1,16})?(?:\n)?(?:\D{1,6})?(?:\n)?(\d{2,16}))/gim;
         return this.loopMatches( str, pattern );
     }
 
@@ -29,7 +29,7 @@ class ExtractorInvoiceNumber extends Extractor {
      * @returns {Object} r
      */
     cleanup( key, value ) {
-        var r = {};
+        let r = {};
         if ( /datum|date|betrag|adr|waren|empf|per.|konto|amount|ean|total|periode|kunde/gi.test( key ) ) {
             return null;
         }

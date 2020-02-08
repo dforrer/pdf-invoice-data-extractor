@@ -1,5 +1,5 @@
 // Requirements
-var Extractor = require( './Extractor.js' );
+let Extractor = require( './Extractor.js' );
 
 /**
  * Extracts the ESR reference from the pdf text
@@ -19,7 +19,7 @@ class ExtractorInvoiceEsrReference extends Extractor {
      * @returns {Object} rv
      */
     extractRegex( str ) {
-        var pattern = /(\d{5,27})\+/gim;
+        let pattern = /(\d{5,27})\+/gim;
         return this.loopMatches( str, pattern );
     }
 
@@ -29,7 +29,7 @@ class ExtractorInvoiceEsrReference extends Extractor {
      * @returns {Object} r
      */
     cleanup( key, value ) {
-        var r = {};
+        let r = {};
         r.value = value.g1;
         r.match = value.g1;
         r.position = value.i;

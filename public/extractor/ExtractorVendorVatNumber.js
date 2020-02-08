@@ -1,5 +1,5 @@
 // Requirements
-var Extractor = require( './Extractor.js' );
+let Extractor = require( './Extractor.js' );
 
 /**
  * Extracts the vendor vat number from the pdf text
@@ -19,7 +19,7 @@ class ExtractorVendorVatNumber extends Extractor {
      * @returns {Object} rv
      */
     extractRegex( str ) {
-        var pattern = /((?:(?:CHE)(?:-|\s)?)\d{3}(?:\.|\s)?\d{3}(?:\.|\s)?\d{3})(?: |\t)?/gim;
+        let pattern = /((?:(?:CHE)(?:-|\s)?)\d{3}(?:\.|\s)?\d{3}(?:\.|\s)?\d{3})(?: |\t)?/gim;
         return this.loopMatches( str, pattern );
     }
 
@@ -29,7 +29,7 @@ class ExtractorVendorVatNumber extends Extractor {
      * @returns {Object} r
      */
     cleanup( key, value ) {
-        var r = {};
+        let r = {};
         r.match = key;
         r.value = value.g1.replace( /-/gi, '' )
             .replace( /\./gi, '' )

@@ -1,5 +1,5 @@
 // Requirements
-var Extractor = require( './Extractor.js' );
+let Extractor = require( './Extractor.js' );
 
 /**
  * Extracts the vendor name from the extracted_data JSON-Object
@@ -29,15 +29,15 @@ class ExtractorVendorName extends Extractor {
      */
     extract() {
         // find supplier for vendor_iban
-        for ( var i = 0; i < this.extracted_data.vendor_iban.length; i++ ) {
-            var ibanValue = this.extracted_data.vendor_iban[ i ].value;
-            var res = this.suppliers_loader.getSupplierForIban( ibanValue );
+        for ( let i = 0; i < this.extracted_data.vendor_iban.length; i++ ) {
+            let ibanValue = this.extracted_data.vendor_iban[ i ].value;
+            let res = this.suppliers_loader.getSupplierForIban( ibanValue );
             if ( res.posting_block == true ) {
                 continue;
             }
             if ( res != 0 ) {
                 // add vendor_name to extracted_data
-                var vendor_name = [ {
+                let vendor_name = [ {
                     match: this.extracted_data.vendor_iban[ i ].match,
                     value: res.name1,
                     position: 0
@@ -47,14 +47,14 @@ class ExtractorVendorName extends Extractor {
         }
 
         // find supplier for vendor_vat_number
-        for ( var i = 0; i < this.extracted_data.vendor_vat_number.length; i++ ) {
-            var vat_number = this.extracted_data.vendor_vat_number[ i ].value;
-            var res = this.suppliers_loader.getSupplierForVatNumber( vat_number );
+        for ( let i = 0; i < this.extracted_data.vendor_vat_number.length; i++ ) {
+            let vat_number = this.extracted_data.vendor_vat_number[ i ].value;
+            let res = this.suppliers_loader.getSupplierForVatNumber( vat_number );
             if ( res.posting_block == true ) {
                 continue;
             }
             if ( res != 0 ) {
-                var vendor_name = [ {
+                let vendor_name = [ {
                     match: this.extracted_data.vendor_vat_number[ i ].match,
                     value: res.name1,
                     position: 0
@@ -63,7 +63,7 @@ class ExtractorVendorName extends Extractor {
             }
         }
 
-        var vendor_name = [ {
+        let vendor_name = [ {
             match: '',
             value: '',
             position: 0

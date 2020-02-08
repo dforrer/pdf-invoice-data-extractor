@@ -1,5 +1,5 @@
 // Requirements
-var Extractor = require( './Extractor.js' );
+let Extractor = require( './Extractor.js' );
 
 /**
  * Extracts the invoice currency from the pdf text
@@ -19,7 +19,7 @@ class ExtractorInvoiceCurrency extends Extractor {
      * @returns {Object} rv
      */
     extractRegex( str ) {
-        var pattern = /(\bCHF\b)|(\bEUR\b)|(\bUSD\b)|(\bGBP\b)|(€)|(\$)/gim;
+        let pattern = /(\bCHF\b)|(\bEUR\b)|(\bUSD\b)|(\bGBP\b)|(€)|(\$)/gim;
         return this.loopMatches( str, pattern );
     }
 
@@ -29,7 +29,7 @@ class ExtractorInvoiceCurrency extends Extractor {
      * @returns {Object} r
      */
     cleanup( key, value ) {
-        var r = {};
+        let r = {};
         r.match = key;
         r.value = value.g1;
         if ( r.value === '$' ) {
@@ -47,7 +47,7 @@ class ExtractorInvoiceCurrency extends Extractor {
      * @private
      */
     iterateMatchesCleanup( obj ) {
-        var arr = super.iterateMatchesCleanup( obj );
+        let arr = super.iterateMatchesCleanup( obj );
         // set default value
         if ( arr.length === 0 ) {
             arr.push( {

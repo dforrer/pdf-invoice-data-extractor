@@ -1,5 +1,5 @@
 // Requirements
-var Extractor = require( './Extractor.js' );
+let Extractor = require( './Extractor.js' );
 
 /**
  * Extracts the invoice date from the pdf text
@@ -20,7 +20,7 @@ class ExtractorInvoiceDate extends Extractor {
      */
     extractRegex( str ) {
         // datum_dirty_ddmmyy allows whitespace as separators between numbers
-        var pattern = /\b(31)(?:\/|-|\.|\040)\D?((?:0?[13578]|1[02])|(?:januar|jan|january|janvier|März|mär|mar|Marz|march|mars|Mai|may|Juli|jul|july|juillet|august|aug|aout|août|oktober|okt|october|octobre|dezember|dez|december|décembre|decembre))(?:\/|-|\.|\040)((?:20)?\d{2})\b|\b(29|30)(?:\/|-|\.|\040)\D?((?:0?[1,3-9]|1[0-2])|(?:januar|jan|january|janvier|März|mär|mar|Marz|march|mars|April|apr|avril|Mai|may|Juni|jun|june|juin|Juli|jul|july|juillet|august|aug|aout|août|september|sep|sept|septembre|oktober|okt|october|octobre|november|nov|novembre|dezember|dez|december|décembre|decembre))(?:\/|-|\.|\040)\D?((?:20)?\d{2})\b|\b(29)(?:\/|-|\.|\040)\D?(0?2|(februar|febr?|february|février))\D?(?:\/|-|\.|\040)\D?((?:(?:20)?(?:0[48]|[2468][048]|[13579][26])|((16|[2468][048]|[3579][26])00)))\b|\b(0?[1-9]|1\d|2[0-8])\D?(?:\/|-|\.|\040)\D?((?:0?[1-9])|(?:1[0-2])|(?:\ |\t)?(?:januar|jan|january|janvier|februar|febr?|february|février|März|mär|mar|Marz|march|mars|April|apr|avril|Mai|may|Juni|jun|june|juin|Juli|jul|july|juillet|august|aug|aout|août|september|sep|sept|septembre|oktober|okt|october|octobre|november|nov|novembre|dezember|dez|december|décembre|decembre))\D?(?:\/|-|\.|\040)\D?((?:20)?\d{2})\b/gim;
+        let pattern = /\b(31)(?:\/|-|\.|\040)\D?((?:0?[13578]|1[02])|(?:januar|jan|january|janvier|März|mär|mar|Marz|march|mars|Mai|may|Juli|jul|july|juillet|august|aug|aout|août|oktober|okt|october|octobre|dezember|dez|december|décembre|decembre))(?:\/|-|\.|\040)((?:20)?\d{2})\b|\b(29|30)(?:\/|-|\.|\040)\D?((?:0?[1,3-9]|1[0-2])|(?:januar|jan|january|janvier|März|mär|mar|Marz|march|mars|April|apr|avril|Mai|may|Juni|jun|june|juin|Juli|jul|july|juillet|august|aug|aout|août|september|sep|sept|septembre|oktober|okt|october|octobre|november|nov|novembre|dezember|dez|december|décembre|decembre))(?:\/|-|\.|\040)\D?((?:20)?\d{2})\b|\b(29)(?:\/|-|\.|\040)\D?(0?2|(februar|febr?|february|février))\D?(?:\/|-|\.|\040)\D?((?:(?:20)?(?:0[48]|[2468][048]|[13579][26])|((16|[2468][048]|[3579][26])00)))\b|\b(0?[1-9]|1\d|2[0-8])\D?(?:\/|-|\.|\040)\D?((?:0?[1-9])|(?:1[0-2])|(?:\ |\t)?(?:januar|jan|january|janvier|februar|febr?|february|février|März|mär|mar|Marz|march|mars|April|apr|avril|Mai|may|Juni|jun|june|juin|Juli|jul|july|juillet|august|aug|aout|août|september|sep|sept|septembre|oktober|okt|october|octobre|november|nov|novembre|dezember|dez|december|décembre|decembre))\D?(?:\/|-|\.|\040)\D?((?:20)?\d{2})\b/gim;
         return this.loopMatches( str, pattern );
     }
 
@@ -30,11 +30,11 @@ class ExtractorInvoiceDate extends Extractor {
      * @returns {Object} r
      */
     cleanup( key, value ) {
-        var r = {};
+        let r = {};
         r.match = key;
-        var dd = value.g1.padStart( 2, '0' );
-        var mm = '01'; // default value
-        var g2 = value.g2;
+        let dd = value.g1.padStart( 2, '0' );
+        let mm = '01'; // default value
+        let g2 = value.g2;
 
         if ( /januar|jan|january|janvier|\b1\b|01/gi.test( g2 ) ) {
             mm = '01';
@@ -61,7 +61,7 @@ class ExtractorInvoiceDate extends Extractor {
         } else if ( /dezember|dez|december|décembre|decembre|12/gi.test( g2 ) ) {
             mm = '12';
         }
-        var yyyy = '';
+        let yyyy = '';
         if ( value.g3.length == 2 ) {
             yyyy = '20' + value.g3
         } else {
@@ -69,9 +69,9 @@ class ExtractorInvoiceDate extends Extractor {
         }
         r.value = dd + '.' + mm + '.' + yyyy;
         r.position = value.i;
-        var inv_date = new Date( yyyy + '-' + mm + '-' + dd );
-        var today_date = new Date();
-        var days_between = ( today_date - inv_date ) / ( 1000 * 60 * 60 * 24 );
+        let inv_date = new Date( yyyy + '-' + mm + '-' + dd );
+        let today_date = new Date();
+        let days_between = ( today_date - inv_date ) / ( 1000 * 60 * 60 * 24 );
         if ( days_between > ( 365 * 20 ) || days_between < ( -30 * 4 ) ) {
             return null;
         }

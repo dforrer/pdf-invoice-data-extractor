@@ -18,13 +18,13 @@ class ValidatorAmount {
      * @returns {object} rv
      */
     validate( str ) {
-        var rv = {
+        let rv = {
             input: str,
             valid: true,
             default: false
         };
         // remove whitespace from front and end and split
-        var outputSplit = str.trim().split( '' );
+        let outputSplit = str.trim().split( '' );
         if ( outputSplit[ outputSplit.length - 2 ] == ' ' ) {
             outputSplit.splice( outputSplit.length - 2 );
         }
@@ -32,7 +32,7 @@ class ValidatorAmount {
         // replace all non-digits (commas, dots, upticks) with dots
         str = str.replace( /\D/g, '.' );
         // replace all but the last dot with nothing
-        var f = parseFloat( str.replace( /\.(?![^.]+$)|[^0-9.]/g, '' ) );
+        let f = parseFloat( str.replace( /\.(?![^.]+$)|[^0-9.]/g, '' ) );
         // check if f is NaN and not undefined
         if ( f === NaN || !f ) {
             rv.output = rv.input;

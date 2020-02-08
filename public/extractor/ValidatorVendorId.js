@@ -18,7 +18,7 @@ class ValidatorVendorId {
      * @returns {object} rv
      */
     validate( str, suppliers_loader ) {
-        var rv = {
+        let rv = {
             input: str,
             valid: true,
             default: false
@@ -26,7 +26,7 @@ class ValidatorVendorId {
         str = str.trim();
         if ( /^\d+$/gi.test( str ) ) {
             rv.output = str;
-            var res = suppliers_loader.getSupplierForId( str );
+            let res = suppliers_loader.getSupplierForId( str );
             if ( res ) {
                 document.getElementById( 'input_vendor_name' ).value = res.name1;
             } else {

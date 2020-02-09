@@ -5,9 +5,14 @@ const js2xmlparser = require( "js2xmlparser" );
 const settings = require( './../../config/settings.json' );
 const PdfExtractJob = require( './PdfExtractJob.js' );
 const SuppliersLoader = require( './SuppliersLoader.js' );
+const Queue = require( './Queue.js' );
 
 /**
- *
+ * The BackendController class handles:
+ * - Loading of the suppliers list (suppliers_loader)
+ * - Sets up the communication with the frontend (ipcMain)
+ * - Receives PDFs from the frontend, extracts the field values and
+ *   sends them back to the frontend (pdf_queue)
  * @class
  */
 class BackendController {
@@ -15,7 +20,7 @@ class BackendController {
     constructor( ipcMain ) {
         this.ipcMain = ipcMain;
         this.running_jobs_count = 0;
-        this.pdf_queue = [];
+        this.pdf_queue = new Queue();
         this.suppliers_loader = new SuppliersLoader();
         this.suppliers_loader.loadFromCsv( settings[ 'suppliers_csv_path' ], function() {
             console.log( 'loadSuppliers finished' );
@@ -26,33 +31,10 @@ class BackendController {
     // Public methods
     //====================
 
-    /*
-     * @param {Object} pdf_document
-     * e.g. { "event":event, "pdf":arg }
-     */
-    add( pdf_document ) {
-        this.pdf_queue.unshift( pdf_document );
-    }
-
-    remove() {
-        this.pdf_queue.pop();
-    }
-
-    last() {
-        return this.pdf_queue[ this.pdf_queue.length - 1 ];
-    }
-
-    size() {
-        return this.pdf_queue.length;
-    }
-
-    /*
-     *
-     */
     registerIpcEvents() {
         this.ipcMain.on( 'extract-data-from-pdf', ( event, arg ) => {
             //console.log( event );
-            this.add( {
+            this.pdf_queue.append( {
                 "event": event,
                 "pdf": arg
             } );
@@ -76,12 +58,11 @@ class BackendController {
      * Async function
      */
     async scheduleExtractJob() {
-        if ( this.size() == 0 || this.running_jobs_count > 1 ) {
+        if ( this.pdf_queue.size() == 0 || this.running_jobs_count > 1 ) {
             return;
         }
         this.running_jobs_count += 1;
-        let next = this.last();
-        this.remove();
+        let next = this.pdf_queue.removeAtIndex();
         let pdfExtractJob = new PdfExtractJob( next.pdf.filepath, this.suppliers_loader );
         let extracted_data = {};
         try {

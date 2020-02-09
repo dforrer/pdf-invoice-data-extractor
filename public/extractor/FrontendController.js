@@ -8,10 +8,7 @@ const settings = require( './../../config/settings.json' );
 const SuppliersLoader = require( '../extractor/SuppliersLoader.js' );
 const Sidebar = require( '../extractor/Sidebar.js' );
 const SidebarField = require( '../extractor/SidebarField.js' );
-
-// Global
-let pdf_queue = [];
-let pdf_queue_index = 0;
+const Queue = require( '../extractor/Queue.js' );
 
 // GUI variables
 let viewer = null; // div 'viewer' reference from PDFViewerApplication
@@ -30,12 +27,16 @@ class Pdf {
 }
 
 /**
- *
+ * The BackendController class handles:
+ * - Loading of the suppliers list (suppliers_loader)
+ * - handles the GUI index_frontend_controller.html
+ * - Sends PDFs to the backend, receives the PDFs including the extracted data
  * @class
  */
 class FrontendController {
 
     constructor() {
+        this.pdf_queue = new Queue();
         this.pdf_loaded = false;
         this.settings = settings;
         this.suppliers_loader = new SuppliersLoader();
@@ -59,9 +60,9 @@ class FrontendController {
         const $this = this;
         window.addEventListener( 'keyup', function( e ) {
             if ( e.ctrlKey && e.key.toLowerCase() === "n" ) {
-                $this.nextPdf( 1 );
+                $this.nextPdf();
             } else if ( e.ctrlKey && e.key.toLowerCase() === "b" ) {
-                $this.nextPdf( -1 );
+                $this.previousPdf();
             }
         } );
     }
@@ -147,11 +148,10 @@ class FrontendController {
         ipcRenderer.on( 'data-extraction-done', ( event, arg ) => {
             let newPdf = new Pdf( arg.filepath, arg.extracted_data );
             delete newPdf.extracted_data.seiten;
-            pdf_queue.push( newPdf );
+            $this.pdf_queue.append( newPdf );
             $this.sidebar.updateButtonLoadNextPdf();
             if ( $this.pdf_loaded == false ) {
-                pdf_queue_index = -1;
-                $this.nextPdf( 1 );
+                $this.nextPdf();
             }
         } );
     }
@@ -173,46 +173,63 @@ class FrontendController {
         } );
     }
 
-    async nextPdf( plusMinusOne ) {
+    async reset() {
         this.unregisterMouseEvents();
         FrontendController.removeSpanEventListener();
         this.pdf_loaded = false;
         await PDFViewerApplication.close();
         this.sidebar.clear();
-        if ( pdf_queue.length > 0 ) {
-            pdf_queue_index += plusMinusOne;
-            if ( pdf_queue_index < 0 ) {
-                pdf_queue_index = pdf_queue.length - 1;
-            }
-            pdf_queue_index = pdf_queue_index % pdf_queue.length;
-            let next_pdf = pdf_queue[ pdf_queue_index ];
-            this.pdf_loaded = true;
-            await PDFViewerApplication.open( next_pdf.filepath );
-            this.sidebar.fill( next_pdf.extracted_data );
-            this.registerMouseEvents();
-            this.sidebar.fields[ 0 ].input.focus(); // set focus to the first field in the sidebar
-        }
         this.sidebar.updateButtonLoadNextPdf();
+    }
+
+    async loadPdf( pdf ) {
+        this.pdf_loaded = true;
+        await PDFViewerApplication.open( pdf.filepath );
+        this.sidebar.fill( pdf.extracted_data );
+        this.registerMouseEvents();
+        this.sidebar.fields[ 0 ].input.focus(); // set focus to the first field in the sidebar
+        this.sidebar.updateButtonLoadNextPdf();
+    }
+
+    nextPdf() {
+        this.reset();
+        if ( this.pdf_queue.size() > 0 ) {
+            let pdf = this.pdf_queue.next();
+            this.loadPdf( pdf );
+        }
+    }
+
+    previousPdf() {
+        this.reset();
+        if ( this.pdf_queue.size() > 0 ) {
+            let pdf = this.pdf_queue.previous();
+            this.loadPdf( pdf );
+        }
+    }
+
+    reloadPdf() {
+        this.reset();
+        if ( this.pdf_queue.size() > 0 ) {
+            let pdf = this.pdf_queue.current();
+            this.loadPdf( pdf );
+        }
     }
 
     async deletePdfFromQueue() {
         console.log( 'deletePdfFromQueue called' );
-        pdf_queue.splice( pdf_queue_index, 1 );
-        if ( pdf_queue_index >= 1 ) {
-            pdf_queue_index -= 1;
-        }
-        await this.nextPdf( -1 );
+        this.pdf_queue.removeAtIndex();
+        await this.nextPdf();
     }
 
     async clearPdfQueue() {
-        pdf_queue = [];
-        await this.nextPdf( -1 );
+        this.pdf_queue.clear();
+        await this.nextPdf();
     }
 
     exportPdfData() {
         console.log( 'exportPdfData called' );
-        if ( pdf_queue.length > 0 ) {
-            let pdf = pdf_queue[ pdf_queue_index ];
+        if ( this.pdf_queue.size() > 0 ) {
+            let pdf = this.pdf_queue.current();
             pdf.validated_data = this.sidebar.collectFieldValues();
             ipcRenderer.send( 'export-pdf-data', pdf );
             // TODO implement exportPdfData

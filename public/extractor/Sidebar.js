@@ -69,9 +69,12 @@ class Sidebar {
     }
 
     updateButtonLoadNextPdf() {
-        let el = document.getElementById( 'current_pdf' );
-        if ( pdf_queue.length > 0 ) {
-            el.innerHTML = ( pdf_queue_index + 1 ) + "/" + pdf_queue.length;
+        let el = document.getElementById( 'reload_pdf' );
+        let index = this.frontendCntlr.pdf_queue.getIndex();
+        let size = this.frontendCntlr.pdf_queue.size();
+        if ( size > 0 ) {
+            index++;
+            el.innerHTML = `${index}/${size}`;
         } else {
             el.innerHTML = "0/0";
         }

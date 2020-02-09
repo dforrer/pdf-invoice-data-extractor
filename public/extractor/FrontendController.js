@@ -48,6 +48,9 @@ class FrontendController {
         this.sidebar.renderSidebarFields();
         this.sidebar.setButtonTitles();
         this.sidebar.registerLongPressHandler();
+        this.registerDropAreaEvent();
+        this.setupIPC();
+        this.registerKeyboardHandler();
         FrontendController.waitForElement();
     }
 
@@ -232,13 +235,13 @@ class FrontendController {
             let pdf = this.pdf_queue.current();
             pdf.validated_data = this.sidebar.collectFieldValues();
             ipcRenderer.send( 'export-pdf-data', pdf );
-            // TODO implement exportPdfData
             this.deletePdfFromQueue();
         }
     }
 
-    /*
+    /**
      * Triggers the "findagain" search event from viewer.js
+     * @param  {string} searchText string to search in the pdf document
      */
     static searchPdf( searchText ) {
         console.log( 'searchPdf called: ' + searchText );

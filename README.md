@@ -45,6 +45,26 @@ Regular expressions are used to extract the field values from a text only versio
 
 ```
 
+## JS-File invokation
+
+- main.js
+  - public/web/index_frontend_controller.html
+    - ../build/pdf.js
+    - viewer.js
+      - ../build/pdf.js
+    - ../extractor/FrontendController.js
+      - ../extractor/SuppliersLoader.js
+      - ../extractor/Sidebar.js
+        - ../extractor/SidebarField.js
+          - Validator{..}.js (ValidatorClass)
+      - ../extractor/Queue.js
+  - ./public/extractor/BackendController.js
+    - ./PdfExtractJob.js
+      - Extractor{..}.js (ExtractorClass)
+        - ./Extractor.js (Base class)
+    - ./SuppliersLoader.js
+    - ./Queue.js
+
 
 ## Installation and Usage
 

@@ -7,7 +7,6 @@ const settings = require( './../../config/settings.json' );
 
 const SuppliersLoader = require( '../extractor/SuppliersLoader.js' );
 const Sidebar = require( '../extractor/Sidebar.js' );
-const SidebarField = require( '../extractor/SidebarField.js' );
 const Queue = require( '../extractor/Queue.js' );
 
 // GUI variables

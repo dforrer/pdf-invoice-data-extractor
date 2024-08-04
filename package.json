@@ -13,7 +13,7 @@
   "author": "Daniel Forrer",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.18.2",
+    "express": "^4.19.2",
     "js2xmlparser": "^4.0.1",
     "pdf.js-extract": "^0.1.4"
   },
